@@ -27,7 +27,7 @@ export type TopicMasteryItem = {
 export type StudentProgressResponse = {
   student_id: string;
   theta: number;
-  review_load: int;
+  review_load: number;
   topic_mastery: TopicMasteryItem[];
   weak_topics: string[];
 };

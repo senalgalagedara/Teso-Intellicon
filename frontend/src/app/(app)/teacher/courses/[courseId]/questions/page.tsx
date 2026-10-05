@@ -182,11 +182,13 @@ export default async function CourseQuestionsPage({
                   </div>
 
                   <form
-                    action={async () => {
+                    action={async (formData: FormData) => {
                       "use server";
-                      await deleteQuestionAction(q.id, courseId);
+                      const qId = formData.get("questionId") as string;
+                      await deleteQuestionAction(qId, courseId);
                     }}
                   >
+                    <input type="hidden" name="questionId" value={q.id} />
                     <button
                       type="submit"
                       className="btn btn-secondary"
