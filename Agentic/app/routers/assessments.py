@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
+import hashlib
 from sqlalchemy import select
 from app.assessment import db, service, learning
 from app.assessment.auth import authenticate, Identity
@@ -47,8 +48,12 @@ def job(sid: str, identity: Identity = Depends(authenticate)):
 
 @router.get('/sessions/{sid}/media/{mid}')
 def image(sid: str, mid: str, identity: Identity = Depends(authenticate)):
-    with db.engine.connect() as conn: m = service.allowed_media(conn, sid, mid, identity)
-    try: raw = Storage().read(m)
+    with db.engine.connect() as conn:
+        m = service.allowed_media(conn, sid, mid, identity)
+        checksum = conn.execute(select(db.catalog.images.c.sha256).where(db.catalog.images.c.id == mid)).scalar_one_or_none()
+    try:
+        raw = Storage().read(m)
+        if checksum and hashlib.sha256(raw).hexdigest() != checksum: raise MediaError('Approved image bytes changed')
     except MediaError: raise HTTPException(503, 'Approved image currently unavailable') from None
     return Response(raw, media_type=m['mime_type'], headers={'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff'})
 

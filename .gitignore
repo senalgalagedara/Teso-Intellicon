@@ -21,6 +21,8 @@ dist/
 *.db-shm
 *.db-wal
 .pytest_cache/
+# Private, locally generated training datasets
+Agentic/exports/
 # User-supplied credentials stored outside environment files
 **/*APIkey*
 

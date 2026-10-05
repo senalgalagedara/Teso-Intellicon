@@ -198,6 +198,8 @@ def allowed_media(conn, sid, mid, identity):
     for q in question_rows(conn, sid):
         allowed.update(q['media_ids'])
         for o in q['options']: allowed.update(o['media_ids'])
-        if s['status'] == 'submitted': allowed.update(q['solution_media_ids'])
+        if s['status'] == 'submitted':
+            allowed.update(q['solution_media_ids'])
+            for r in conn.execute(select(db.resources.c.content).where(db.resources.c.id.in_(q['resource_ids']))).scalars(): allowed.update(r.get('media_ids', []))
     if mid not in allowed: raise HTTPException(404, 'Media not available in this assessment')
     return conn.execute(select(db.media.c.content).where(db.media.c.id == mid)).scalar_one()

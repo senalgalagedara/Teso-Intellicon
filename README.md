@@ -42,6 +42,7 @@ Production requires reviewed published paper packages. The included English, Sin
 
 - [Assessment setup and API contract](docs/assessment-service.md)
 - [Personalized follow-ups and history](docs/personalized-learning.md)
+- [Content tables, languages, images and ML export](docs/content-database.md)
 - [Separate hosting](docs/separate-hosting.md)
 - [Verification record](docs/assessment-verification.md)
 

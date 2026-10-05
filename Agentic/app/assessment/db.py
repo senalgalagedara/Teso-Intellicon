@@ -47,6 +47,15 @@ def make_engine(url):
 
 engine = make_engine(settings.DATABASE_URL)
 
+def migration_engine():
+    """Use the supplied direct URL, or the same Neon endpoint without pooling."""
+    if settings.DATABASE_URL_UNPOOLED: return make_engine(settings.DATABASE_URL_UNPOOLED)
+    url = engine.url
+    if url.host and url.host.endswith('.neon.tech') and '-pooler.' in url.host:
+        url = url.set(host=url.host.replace('-pooler.', '.', 1))
+        return make_engine(url.render_as_string(hide_password=False))
+    return engine
+
 def begin(db):
     """Serialize SQLite writes; PostgreSQL uses per-session row locks."""
     conn = db.connect()
@@ -55,3 +64,6 @@ def begin(db):
     else:
         conn.begin()
     return conn
+
+# Register the additive normalized catalog with the same migration owner.
+from app.assessment import catalog as catalog

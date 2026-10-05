@@ -26,6 +26,8 @@ class Settings(BaseSettings):
 
     # Assessment service: explicit provider, no automatic mock on live failures.
     DATABASE_URL: str = "sqlite:///./teso-dev.db"
+    DATABASE_URL_UNPOOLED: str = ""
+    ML_EXPORT_SALT: str = ""
     ASSESSMENT_BRIDGE_SECRET: str = ""
     ALLOW_DEVELOPMENT_CONTENT: bool = False
     AI_PROVIDER: str = "mock"

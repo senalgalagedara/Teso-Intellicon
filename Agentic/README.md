@@ -59,3 +59,8 @@ the matching bridge secret. No Python runtime is needed on the Next.js host.
 
 Full [assessment contract and demonstration](../docs/assessment-service.md) and
 [separate hosting guide](../docs/separate-hosting.md).
+
+The normalized [content database](../docs/content-database.md) adds multilingual
+subject/question versions, answer choices, theory, private image links and an
+optional offline ML dataset exporter. Apply migration 003 with the same explicit
+`migrate` command. Existing question IDs, grades and history are retained.

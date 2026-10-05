@@ -1,6 +1,7 @@
 """Durable lease-based worker. Per-question writes retain progress across restarts."""
 import asyncio
 import base64
+import hashlib
 import time
 import uuid
 from sqlalchemy import select, or_, and_
@@ -67,8 +68,9 @@ async def process_claimed(engine, job, provider, storage):
             renew(conn, job)
             if conn.execute(select(db.analyses.c.question_id).where(db.analyses.c.session_id == sid, db.analyses.c.question_id == q['id'])).first(): continue
             resources = [conn.execute(select(db.resources.c.content).where(db.resources.c.id == rid)).scalar_one() for rid in q['resource_ids']]
-            mids = q['media_ids'] + q['solution_media_ids'] + [mid for o in q['options'] for mid in o['media_ids']]
+            mids = list(dict.fromkeys(q['media_ids'] + q['solution_media_ids'] + [mid for o in q['options'] for mid in o['media_ids']] + [mid for r in resources for mid in r.get('media_ids', [])]))
             records = [conn.execute(select(db.media.c.content).where(db.media.c.id == mid)).scalar_one() for mid in mids]
+            checksums = dict(conn.execute(select(db.catalog.images.c.id, db.catalog.images.c.sha256).where(db.catalog.images.c.id.in_(mids))).all())
         evidence = {'question': q, 'selected_option': answer_map[q['id']], 'resources': resources, 'allowed_concept_ids': [q['concept_id']], 'allowed_resource_ids': q['resource_ids'], 'language': s['language'], 'media_transcriptions': [{'id': m['id'], 'role': m['role'], 'text': m['transcription']} for m in records]}
         images, usage, reason = [], {}, None
         try:
@@ -78,6 +80,8 @@ async def process_claimed(engine, job, provider, storage):
                 for m in records:
                     with engine.begin() as conn: renew(conn, job)
                     raw = await asyncio.wait_for(asyncio.to_thread(storage.read, m), timeout=30)
+                    if checksums.get(m['id']) and hashlib.sha256(raw).hexdigest() != checksums[m['id']]:
+                        raise MediaError('Approved image bytes changed')
                     images.extend([{'type': 'text', 'text': f"Approved {m['role']} image {m['id']}"}, {'type': 'image_url', 'image_url': {'url': f"data:{m['mime_type']};base64,{base64.b64encode(raw).decode()}", 'detail': 'high'}}])
             # Whole-question timeout also bounds injected providers and storage overhead.
             feedback, usage = await asyncio.wait_for(provider.generate(evidence, images), timeout=settings.AI_REQUEST_TIMEOUT_SECONDS + 1)

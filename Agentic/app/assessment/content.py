@@ -23,6 +23,8 @@ class Resource(Strict):
     id: Id
     version: int = Field(ge=1)
     concept_id: Id
+    language: Literal['en', 'si', 'ta'] | None = None
+    media_ids: list[Id] = Field(default_factory=list)
     title: str
     theory: str = Field(min_length=1)
     url: str | None = None
@@ -37,7 +39,8 @@ class Media(Strict):
     id: Id
     object_key: str
     mime_type: Literal['image/png', 'image/jpeg', 'image/webp']
-    role: Literal['question', 'option', 'solution']
+    role: Literal['question', 'option', 'solution', 'theory']
+    bucket_id: Id | None = None
     transcription: str | None = None
 
     @model_validator(mode='after')
@@ -64,6 +67,8 @@ class NumericResult(Strict):
 
 class Question(Strict):
     id: Id  # Immutable version identifier, e.g. force-v1
+    family_id: Id | None = None
+    language: Literal['en', 'si', 'ta'] | None = None
     version: int = Field(ge=1)
     text: str = ''
     media_ids: list[Id] = Field(default_factory=list)
@@ -94,6 +99,7 @@ class Paper(Strict):
     is_development: bool
     question_ids: list[Id] = Field(min_length=1, max_length=200)
     subject_id: Id | None = None
+    subject_version: int = Field(default=1, ge=1)
     content_language: Literal['en', 'si', 'ta'] = 'en'
     marking_rule: Literal['single_answer_no_penalty']
 
@@ -119,15 +125,24 @@ class Package(Strict):
                 raise ValueError(f'Unknown {name} reference: {key}')
         for u in self.units: require('subjects', u.subject_id)
         for c in self.concepts: require('units', c.unit_id)
-        for r in self.resources: require('concepts', r.concept_id)
+        for r in self.resources:
+            require('concepts', r.concept_id)
+            for mid in r.media_ids:
+                require('media', mid)
+                if maps['media'][mid].role != 'theory': raise ValueError('Theory image role mismatch')
+            if len(set(r.media_ids)) != len(r.media_ids): raise ValueError('Duplicate theory images')
         for q in self.questions:
             require('concepts', q.concept_id)
+            if q.language and q.language != self.paper.content_language: raise ValueError('Question language must match paper content language')
             for rid in q.resource_ids:
                 require('resources', rid)
+                if maps['resources'][rid].language and maps['resources'][rid].language != self.paper.content_language: raise ValueError('Theory language must match question language')
                 if maps['resources'][rid].concept_id != q.concept_id:
                     raise ValueError('Theory concept mismatch')
             groups = [('question', q.media_ids), ('solution', q.solution_media_ids)] + [('option', o.media_ids) for o in q.options]
+            if len(set(q.resource_ids)) != len(q.resource_ids): raise ValueError('Duplicate question theory references')
             for role, ids in groups:
+                if len(set(ids)) != len(ids): raise ValueError('Duplicate image references')
                 for mid in ids:
                     require('media', mid)
                     if maps['media'][mid].role != role:
@@ -148,17 +163,21 @@ class Package(Strict):
 
 def import_package(engine, package: Package, storage):
     # Check all bytes before any database mutation; no missing-media placeholders.
+    media_bytes = {}
     for m in package.media:
-        storage.read(m.model_dump())
+        raw = storage.read(m.model_dump())
+        if isinstance(raw, bytes): media_bytes[m.id] = raw
     with engine.begin() as conn:
         existing_media = list(conn.execute(select(db.media.c.content)).scalars())
         roles = {m['object_key']: m['role'] for m in existing_media}
         for m in package.media:
             if m.object_key in roles and roles[m.object_key] != m.role:
                 raise ValueError('A private object cannot be shared across exam/solution media roles')
-        def immutable(table, values, key='id'):
+        def immutable(table, values, key='id', content_model=None):
             existing = conn.execute(select(table).where(table.c[key] == values[key])).mappings().first()
             if existing:
+                if content_model and content_model.model_validate(existing['content']).model_dump() == values['content']:
+                    values = {**values, 'content': existing['content']}
                 if dict(existing) != values:
                     raise ValueError(f'Immutable content changed: {values[key]}; publish a new version ID')
             else:
@@ -166,11 +185,11 @@ def import_package(engine, package: Package, storage):
         for s in package.subjects: immutable(db.subjects, s.model_dump())
         for u in package.units: immutable(db.units, u.model_dump())
         for c in package.concepts: immutable(db.concepts, c.model_dump())
-        for r in package.resources: immutable(db.resources, {'id': r.id, 'concept_id': r.concept_id, 'content': r.model_dump()})
-        for m in package.media: immutable(db.media, {'id': m.id, 'content': m.model_dump()})
+        for r in package.resources: immutable(db.resources, {'id': r.id, 'concept_id': r.concept_id, 'content': r.model_dump()}, content_model=Resource)
+        for m in package.media: immutable(db.media, {'id': m.id, 'content': m.model_dump()}, content_model=Media)
         for q in package.questions:
             exists = conn.execute(select(db.questions.c.id).where(db.questions.c.id == q.id)).first()
-            immutable(db.questions, {'id': q.id, 'concept_id': q.concept_id, 'content': q.model_dump()})
+            immutable(db.questions, {'id': q.id, 'concept_id': q.concept_id, 'content': q.model_dump()}, content_model=Question)
             if not exists:
                 conn.execute(db.options.insert(), [{'question_id': q.id, 'id': o.id, 'content': o.model_dump()} for o in q.options])
                 conn.execute(db.keys.insert().values(question_id=q.id, option_id=q.correct_option_id))
@@ -182,3 +201,5 @@ def import_package(engine, package: Package, storage):
         immutable(db.papers, {'id': package.paper.id, 'content': paper_content})
         if not exists:
             conn.execute(db.composition.insert(), [{'paper_id': package.paper.id, 'question_id': qid, 'position': i} for i, qid in enumerate(package.paper.question_ids)])
+
+        db.catalog.project(conn, package, media_bytes)

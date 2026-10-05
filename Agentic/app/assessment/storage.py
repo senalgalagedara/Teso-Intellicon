@@ -15,6 +15,8 @@ class Storage:
     def read(self, record):
         m = Media.model_validate(record)
         cfg = self.config
+        if m.bucket_id and m.bucket_id != cfg.ASSESSMENT_STORAGE_BUCKET:
+            raise MediaError('Image bucket is not configured for this service')
         parsed = urlsplit(cfg.SUPABASE_URL)
         if parsed.scheme != 'https' or not parsed.hostname or not parsed.hostname.endswith('.supabase.co') or parsed.username or parsed.port not in (None, 443):
             raise MediaError('Configure a trusted Supabase HTTPS origin')

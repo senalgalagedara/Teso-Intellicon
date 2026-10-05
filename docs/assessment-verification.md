@@ -60,3 +60,12 @@ was performed.
 - The integration used labeled mock feedback for these new jobs and targeted only its own sessions. The earlier live AIML feedback verification remains valid; new adaptation makes no AI-provider requests itself. Anonymous access and cross-origin mutations were rejected, and refresh preserved results/history.
 - Subject/language selection, sign-in continuation, question review and timeline rendering compile successfully. Browser interaction/visual QA and a real student's Neon sign-in remain unverified. Development content and translations need review before production use.
 - Topic/result/catalog queries now batch related records, and frontend polling waits for each response to avoid overlapping requests on a remote database.
+
+## Multilingual content, images and ML preparation
+
+- 124 automated Python tests pass. The added checks cover catalog migration preservation, relational constraints, language/version grouping, private theory images, changed-image rejection, temporal ML features, first-exposure filtering, pseudonymous identifiers and safe offline exports.
+- Next.js production build and ESLint pass with theory-image rendering in submitted results.
+- Additive migration 003 was applied to the configured Neon database using its direct endpoint. Verification confirmed that baseline content, submitted sessions, final responses and saved learning records were unchanged.
+- The catalog contains three languages, three subject-language versions, three topics, 30 question versions/families, 90 answer choices and nine theory sections. One configured private-bucket registry row was added. There are no imported image objects or image links in this database yet; image and vision paths remain verified with mocks.
+- An opt-in offline JSONL exporter separates prediction features from labels and metadata. Features use outcomes available before the target session started; earlier presentations include unfinished sessions. Development examples, known assistance and repeated question families are excluded by default. No real student dataset was exported and no predictive model was trained.
+- Browser interaction/visual checks and a real student's Neon sign-in remain unverified. Existing development content and translations still require team review before production use.

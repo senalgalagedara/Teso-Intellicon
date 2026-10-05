@@ -136,7 +136,7 @@ export default function SelfAssessment() {
         <p>{r.analysis?.feedback.revision_action || "Review the supplied theory and solution."}</p>
         <p className={styles.muted}>{r.analysis ? (r.analysis.status === "ai_generated" ? `AI-generated feedback · ${r.analysis.provider} / ${r.analysis.model}` : r.analysis.status === "mock" ? "Local mock feedback using the base explanation" : `Reviewed fallback · ${r.analysis.fallback_reason}`) : "Reviewed base explanation · analysis pending or unavailable"}{r.analysis?.explanation_language === "reviewed_content" && " · Original reviewed language"}</p>
         <p>Question success rate: {r.success_rate.percentage === null ? "No eligible population data" : `${r.success_rate.percentage}% (${r.success_rate.numerator}/${r.success_rate.denominator}) · ${r.success_rate.sample_label.replaceAll("_", " ")}`}</p><details><summary>How the success rate is calculated</summary><p>{r.success_rate.population}</p></details>
-        <h3>Study resources</h3>{r.resources.map(resource => <details key={resource.id}><summary>{resource.title}</summary><p>{resource.theory}</p>{resource.url && <a href={resource.url} target="_blank" rel="noopener noreferrer">Open approved resource ↗</a>}</details>)}
+        <h3>Study resources</h3>{r.resources.map(resource => <details key={resource.id}><summary>{resource.title}</summary><p>{resource.theory}</p><Media ids={resource.media_ids || []} sid={result.session_id} />{resource.url && <a href={resource.url} target="_blank" rel="noopener noreferrer">Open approved resource ↗</a>}</details>)}
       </section>)}
     </>}
     {history && !showAuth && (!exam || result) && <History history={history} busy={busy} open={sid => {void run(() => openSession(sid));}} />}

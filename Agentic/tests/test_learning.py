@@ -113,7 +113,7 @@ def test_migration_backfills_legacy_submissions_and_is_repeatable(engine, studen
     migrate(engine); migrate(engine)
     with engine.connect() as conn:
         assert learning.history(conn, student)['attempts'][0]['session_id'] == sid
-        assert conn.execute(select(db.schema_versions.c.version).order_by(db.schema_versions.c.version)).scalars().all() == [1, 2]
+        assert conn.execute(select(db.schema_versions.c.version).order_by(db.schema_versions.c.version)).scalars().all() == [1, 2, 3]
 
 def test_population_excludes_later_independent_response_after_practice(engine, student):
     sid = complete(engine, student)
