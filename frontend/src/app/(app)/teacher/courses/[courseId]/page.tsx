@@ -37,7 +37,15 @@ export default async function CourseRosterPage({
           <h1 className="gradient-text">{course.title}</h1>
           <p className="page-subtitle">{course.description ?? "No description."}</p>
         </div>
-        <code className="join-code">{course.code}</code>
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+          <Link href={`/teacher/courses/${course.id}/questions`} className="btn btn-secondary">
+            Question Bank
+          </Link>
+          <Link href={`/teacher/courses/${course.id}/analytics`} className="btn btn-secondary">
+            Item Analytics
+          </Link>
+          <code className="join-code">{course.code}</code>
+        </div>
       </div>
 
       <div className="glass-card">

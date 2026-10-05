@@ -1,12 +1,23 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.routers import health, ai, documents
+from app.db import init_db_pool, close_db_pool
+from app.routers import health, ai, documents, engine
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: initialize database pool
+    await init_db_pool()
+    yield
+    # Shutdown: close database pool
+    await close_db_pool()
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Python FastAPI backend providing AI endpoints and Supabase integration for Next.js frontend."
+    description="Python FastAPI backend hosting AI services and the TESO Revision Engine for G.C.E. A/L education.",
+    lifespan=lifespan
 )
 
 # Enable CORS for Next.js frontend
@@ -22,6 +33,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(ai.router)
 app.include_router(documents.router)
+app.include_router(engine.router) # Revision Engine /v1/*
 
 @app.get("/")
 async def root():
@@ -35,7 +47,15 @@ async def root():
             "/api/ai/chat",
             "/api/ai/analyze",
             "/api/ai/embeddings",
-            "/api/documents/process"
+            "/api/documents/process",
+            "/v1/practice/next",
+            "/v1/attempts/process",
+            "/v1/reviews/due",
+            "/v1/students/{id}/progress",
+            "/v1/students/{id}/peer-diagnostic",
+            "/v1/courses/{id}/item-stats",
+            "/v1/courses/{id}/zscores",
+            "/v1/admin/jobs/{name}"
         ]
     }
 

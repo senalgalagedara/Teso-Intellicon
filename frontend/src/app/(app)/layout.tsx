@@ -58,11 +58,15 @@ function RoleNav({ role }: { role: string }) {
   const links: { href: string; label: string }[] = [{ href: "/dashboard", label: "Overview" }];
 
   if (role === "student") {
-    links.push({ href: "/student", label: "My courses" });
+    links.push({ href: "/student", label: "Courses" });
+    links.push({ href: "/student/practice", label: "Practice" });
+    links.push({ href: "/student/review", label: "Reviews" });
+    links.push({ href: "/student/progress", label: "Progress" });
   }
 
   if (role === "teacher") {
-    links.push({ href: "/teacher", label: "My courses" });
+    links.push({ href: "/teacher", label: "Courses" });
+    links.push({ href: "/teacher/zscores", label: "Z-Scores" });
   }
 
   if (role === "teacher_pending") {
