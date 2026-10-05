@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js + FastAPI AI + Supabase Architecture",
-  description: "Production-ready full-stack template featuring Next.js App Router, Supabase Database & Storage, and Python FastAPI AI Engine.",
+  title: "Teso | Learning & self-assessment",
+  description: "Student self-assessment, saved results and evidence-based study feedback.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

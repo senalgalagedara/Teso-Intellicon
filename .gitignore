@@ -14,6 +14,15 @@ dist/
 .env
 .env.local
 .env*.local
+.env.*
+!.env.example
+!.env.local.example
+*.db
+*.db-shm
+*.db-wal
+.pytest_cache/
+# User-supplied credentials stored outside environment files
+**/*APIkey*
 
 # Logs
 npm-debug.log*

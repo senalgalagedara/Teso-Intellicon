@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { isSupabaseServerConfigured, getSupabaseServer } from "@/lib/supabase/server";
+import { fastapiBaseUrl } from "@/lib/fastapi-url";
 
 export async function GET() {
-  const fastapiUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || "http://127.0.0.1:8000";
+  let fastapiUrl = "Not configured";
   let fastApiStatus = "offline";
   let fastApiDetails: Record<string, unknown> = {};
 
   try {
+    fastapiUrl = fastapiBaseUrl();
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2000);
     const res = await fetch(`${fastapiUrl}/health`, {

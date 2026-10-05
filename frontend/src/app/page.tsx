@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { 
   Sparkles, 
   Database, 
@@ -296,11 +297,12 @@ CREATE POLICY "Allow All" ON public.notes FOR ALL USING (true);`);
                 </span>
               </div>
               <h1 style={{ fontSize: "2.25rem", fontWeight: 800, letterSpacing: "-0.03em" }}>
-                Next.js <span className="gradient-text">+ FastAPI AI</span> + Supabase
+                Teso <span className="gradient-text">Learning & self-assessment</span>
               </h1>
               <p style={{ color: "var(--text-muted)", fontSize: "0.95rem", marginTop: "0.25rem" }}>
-                Next.js App Router (Frontend & Backend API) • Supabase DB & Storage • Python FastAPI AI Service
+                Complete a paper and learn from your saved results.
               </p>
+              <Link className="btn btn-primary" href="/exams" style={{ marginTop: "1rem" }}>Exams & self-assessment →</Link>
             </div>
 
             <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
@@ -892,7 +894,7 @@ CREATE POLICY "Allow All" ON public.notes FOR ALL USING (true);`);
                   2. Launch FastAPI (Python AI Engine)
                 </div>
                 <div className="code-block">
-                  cd backend<br />
+                  cd Agentic<br />
                   .\.venv\Scripts\activate<br />
                   uvicorn app.main:app --reload --port 8000
                 </div>

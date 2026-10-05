@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { fastapiBaseUrl } from "@/lib/fastapi-url";
 
 export async function POST(req: NextRequest) {
-  const fastapiUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || "http://127.0.0.1:8000";
-
   try {
+    const fastapiUrl = fastapiBaseUrl();
     const body = await req.json();
     const action = body.action || "chat"; // 'chat' | 'analyze' | 'embeddings'
 
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       {
         error: "Failed to communicate with FastAPI Python AI backend.",
         details: message,
-        hint: "Ensure FastAPI is running on http://127.0.0.1:8000 (run: uvicorn app.main:app --reload)",
+        hint: "Check FASTAPI_BASE_URL and the independently hosted Agentic service.",
       },
       { status: 503 }
     );

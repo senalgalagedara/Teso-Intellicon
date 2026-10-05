@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.routers import health, ai, documents
+from app.routers import health, ai, documents, assessments
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -22,6 +22,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(ai.router)
 app.include_router(documents.router)
+app.include_router(assessments.router)
 
 @app.get("/")
 async def root():

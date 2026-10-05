@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServer, isSupabaseServerConfigured } from "@/lib/supabase/server";
+import { templateBucketAllowed, templatePathAllowed } from "@/lib/supabase/template-access";
 
 export async function GET(req: NextRequest) {
   try {
+    const requested = req.nextUrl.searchParams.get("bucket") || process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || "app-storage";
+    if (!templateBucketAllowed(requested)) return NextResponse.json({ error: "Private content requires assessment-session authorisation" }, { status: 403 });
     if (!isSupabaseServerConfigured()) {
       return NextResponse.json({
         configured: false,
@@ -18,7 +21,11 @@ export async function GET(req: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET ||
       "app-storage";
 
+    if (!templatePathAllowed(folder)) return NextResponse.json({ error: "Invalid storage folder" }, { status: 422 });
+
     const supabase = getSupabaseServer();
+    const info = await supabase.storage.getBucket(bucket);
+    if (info.error || !info.data.public) return NextResponse.json({ error: "Template storage must use a public bucket" }, { status: 403 });
     const { data, error } = await supabase.storage.from(bucket).list(folder, {
       limit: 50,
       sortBy: { column: "created_at", order: "desc" },

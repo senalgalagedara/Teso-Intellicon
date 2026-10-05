@@ -1,4 +1,17 @@
-# Next.js + FastAPI + Supabase Full-Stack AI Template
+# Teso — student learning and self-assessment
+
+The first assessment milestone extends the template below with Python grading,
+Neon persistence, a database-backed analysis worker, AI/ML API feedback, and an
+authenticated Next.js student flow. Start with the
+[assessment setup, API contract and reproducible demo](docs/assessment-service.md).
+The supplied sample paper is a development fixture, not expert-reviewed content.
+
+Python code lives in **`Agentic/`**; Next.js lives in **`frontend/`**. Deploy each
+folder independently. Set the Next.js server's `FASTAPI_BASE_URL` to the Python
+service's HTTPS origin. See the [separate hosting guide](docs/separate-hosting.md)
+and [Python service instructions](Agentic/README.md).
+
+The original template documentation follows for its existing diagnostic tools.
 
 A state-of-the-art full-stack production template combining **Next.js App Router** (Frontend & Backend API Route Handlers), **Supabase** (PostgreSQL Database & Storage), and a **Python FastAPI** AI Engine.
 
@@ -56,7 +69,7 @@ A state-of-the-art full-stack production template combining **Next.js App Router
 │   ├── .env.local                # Active local environment variables
 │   └── package.json
 │
-├── backend/                      # Python FastAPI AI Backend
+├── Agentic/                      # Python FastAPI AI Backend
 │   ├── app/
 │   │   ├── main.py               # FastAPI entry point with CORS & routes
 │   │   ├── config.py             # Pydantic settings & environment loader
@@ -103,7 +116,7 @@ npm run dev
 
 #### Run FastAPI:
 ```bash
-cd backend
+cd Agentic
 # Windows:
 .\.venv\Scripts\uvicorn app.main:app --reload --port 8000
 # Mac/Linux:
@@ -123,7 +136,7 @@ cd backend
    - **Project URL**
    - **anon / public key**
    - **service_role key** (keep secret!)
-5. Paste these into `frontend/.env.local` and `backend/.env`.
+5. Paste these into `frontend/.env.local` and `Agentic/.env`.
 
 ---
 
@@ -131,7 +144,7 @@ cd backend
 
 The FastAPI engine comes with a **built-in simulated fallback** so you can develop immediately without an API key!
 
-To enable live LLMs, open `backend/.env` and provide either:
+To enable live LLMs, open `Agentic/.env` and provide either:
 - `GEMINI_API_KEY=your_gemini_api_key` (Google AI Studio)
 - or `OPENAI_API_KEY=your_openai_api_key` (OpenAI)
 
