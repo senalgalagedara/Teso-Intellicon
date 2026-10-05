@@ -4,7 +4,7 @@ A state-of-the-art full-stack production template combining **Next.js App Router
 
 ---
 
-## ⚡ Architecture Overview
+## ⚡ Architecture Overview..
 
 ```
                       ┌──────────────────────────────────────────┐
