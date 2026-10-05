@@ -1,3 +1,4 @@
+import { fastapiBaseUrl } from "@/lib/fastapi-url";
 import { NextRequest, NextResponse } from "next/server";
 
 import { authorize, deny } from "@/lib/auth/dal";
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
     return deny(auth);
   }
 
-  const fastapiUrl = process.env.FASTAPI_BASE_URL ?? "http://127.0.0.1:8000";
+  const fastapiUrl = fastapiBaseUrl();
 
   try {
     const body = await req.json();

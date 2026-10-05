@@ -7,6 +7,9 @@ class HealthResponse(BaseModel):
     environment: str
     supabase_configured: bool
     ai_configured: bool
+    assessment_ai_provider: str = 'mock'
+    assessment_ai_model: str = ''
+    assessment_ai_configured: bool = False
 
 class ChatMessage(BaseModel):
     role: str = Field(..., description="Role of the speaker: user, assistant, system")

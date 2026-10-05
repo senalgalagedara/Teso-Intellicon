@@ -1,156 +1,48 @@
-# Next.js + FastAPI + Supabase Full-Stack AI Template
+# Teso Intellicon
 
-A state-of-the-art full-stack production template combining **Next.js App Router** (Frontend & Backend API Route Handlers), **Supabase** (PostgreSQL Database & Storage), and a **Python FastAPI** AI Engine.
+Next.js student/teacher website in `frontend/`, independently hosted Python assessment and AI service in `Agentic/`. Both use Neon PostgreSQL; the website uses the team's Neon Auth and role system. The server-only signed bridge links the authenticated student to Python.
 
----
+Students can open the landing page, select self-assessment, choose subject and paper language, take a paper, review deterministic grades and AI explanations, study missed theory, start a personalized next paper, and inspect saved topic history.
 
-## ⚡ Architecture Overview..
+## Run locally on Windows
 
-```
-                      ┌──────────────────────────────────────────┐
-                      │              Web Browser                 │
-                      └─────────────┬────────────────────┬───────┘
-                                    │                    │
-                  (UI & Direct Edge)│                    │(Direct Storage Upload)
-                                    ▼                    ▼
-        ┌──────────────────────────────────────┐     ┌───────────────────────┐
-        │        Next.js App Router            │     │  Supabase Platform    │
-        │  • Frontend React Components (RSC)   │     │  • PostgreSQL DB      │
-        │  • Next.js Backend API (/api/*)      │◄───►│  • Object Storage     │
-        └──────────────────┬───────────────────┘     │    ('app-storage')    │
-                           │                         │  • Row-Level Security │
-             (Internal AI  │                         └───────────▲───────────┘
-             Service Proxy)│                                     │
-                           ▼                                     │
-        ┌──────────────────────────────────────┐                 │
-        │          Python FastAPI              ├─────────────────┘
-        │  • High-throughput async AI engine   │ (Download & Process Docs)
-        │  • Pydantic data validation          │
-        │  • Chat, Summaries, Embeddings       │
-        │  • OpenAI / Gemini / Claude ready    │
-        └──────────────────────────────────────┘
+For a fresh checkout, create `Agentic/.venv` with `python -m venv Agentic/.venv`, install `Agentic/requirements-dev.txt`, and run `npm ci` in the root and `frontend/`. Merge the example settings into ignored `Agentic/.env` and `frontend/.env.local`; do not overwrite existing credentials. Both servers need matching `ASSESSMENT_BRIDGE_SECRET`. The frontend needs Neon Auth settings and `DATABASE_URL` for the team's roles/courses schema.
+
+Initialize the assessment schema and optional development content:
+
+```powershell
+cd Agentic
+.\.venv\Scripts\python.exe -m app.assessment.cli migrate
+.\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-development.json
+.\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-transfer-en-development.json
+.\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-transfer-si-development.json
+.\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-transfer-ta-development.json
+cd ..
 ```
 
----
+Run these in three separate terminals, from the repository root:
 
-## 📁 Project Directory Structure
-
-```
-├── frontend/                     # Next.js App Router (Frontend + Next.js Backend)
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── api/              # Next.js Backend API Handlers
-│   │   │   │   ├── health/       # Health diagnostic (checks Next.js + FastAPI + Supabase)
-│   │   │   │   ├── ai/           # Proxy to FastAPI AI endpoints
-│   │   │   │   ├── storage/      # Supabase Storage upload and listing handlers
-│   │   │   │   └── notes/        # Supabase PostgreSQL CRUD handlers
-│   │   │   ├── layout.tsx        # Root HTML layout and fonts
-│   │   │   ├── globals.css       # Design system, glassmorphism, responsive utilities
-│   │   │   └── page.tsx          # Interactive dashboard & studio UI
-│   │   └── lib/
-│   │       └── supabase/
-│   │           ├── client.ts     # Browser-safe Supabase client singleton
-│   │           ├── server.ts     # Server-side Supabase client with admin credentials
-│   │           └── storage.ts    # Supabase Storage helper functions
-│   ├── .env.local.example        # Next.js environment configuration template
-│   ├── .env.local                # Active local environment variables
-│   └── package.json
-│
-├── backend/                      # Python FastAPI AI Backend
-│   ├── app/
-│   │   ├── main.py               # FastAPI entry point with CORS & routes
-│   │   ├── config.py             # Pydantic settings & environment loader
-│   │   ├── schemas.py            # Pydantic models for chat, analyze & embeddings
-│   │   ├── routers/
-│   │   │   ├── health.py         # /health endpoint
-│   │   │   ├── ai.py             # /api/ai/chat, /api/ai/analyze, /api/ai/embeddings
-│   │   │   └── documents.py      # /api/documents/process (Supabase Storage doc AI)
-│   │   └── services/
-│   │       ├── ai_service.py     # Multi-provider LLM service (Gemini, OpenAI, Mock fallback)
-│   │       └── supabase_service.py # Python Supabase client & storage integration
-│   ├── .venv/                    # Python virtual environment (pre-created)
-│   ├── requirements.txt          # Python dependencies
-│   ├── .env.example              # FastAPI environment configuration template
-│   └── .env                      # Active local environment variables
-│
-├── supabase_setup.sql            # One-click SQL script for Supabase tables & storage policies
-├── package.json                  # Root monorepo script runner
-└── README.md
+```powershell
+npm run dev:frontend
+npm run dev:agentic
+npm run dev:worker
 ```
 
----
+Open http://localhost:3000. Sign in with a student account for reviewed production papers. To try the sample flow, enable `TESO_DEMO_MODE=true` in the frontend and `ALLOW_DEVELOPMENT_CONTENT=true`, `ENVIRONMENT=development` in Python, then click **Try local development demo** on self-assessment. Demo content and scores are labeled and excluded from population statistics. Use the same browser and hostname for saved demo history.
 
-## 🚀 Quick Start Guide
+`npm run dev` starts the website and API together; the worker still needs its own terminal. Start each service once. If Windows blocks port 8000, run Uvicorn on an available port such as 8081 and set `FASTAPI_BASE_URL=http://127.0.0.1:8081` in the frontend, then restart Next.js.
 
-### 1. Run Both Frontend and Backend Concurrently
-From the project root directory:
-```bash
-npm run dev
-```
-- **Next.js Frontend & API:** [http://localhost:3000](http://localhost:3000)
-- **FastAPI AI Backend:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- **FastAPI Interactive Swagger Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+The worker uses the configured AI provider. `AI_PROVIDER=aimlapi` uses the server-only key; `mock` supplies labeled local feedback. Grading remains deterministic and available while feedback is queued.
 
----
+## Database and deployment
 
-### 2. Run Independently
+The team's application schema is `frontend/migrations/0001_app_schema.sql`; it must exist on the Neon branch used by Auth and the frontend. On a fresh branch, enable Neon Auth first and apply that SQL in Neon's SQL editor. Python's explicit migration command owns only `teso_*` assessment tables, including durable plans and learning snapshots. It backfills older submitted assessments without resetting application data.
 
-#### Run Next.js:
-```bash
-cd frontend
-npm run dev
-```
+Production requires reviewed published paper packages. The included English, Sinhala and Tamil Physics samples demonstrate the flow and need content/language review before student rollout. Adaptive selection uses existing published question versions, preferring fresh questions on missed theory and revisiting prior correct topics. Scores on different papers or repeated questions do not establish mastery or guarantee exam success.
 
-#### Run FastAPI:
-```bash
-cd backend
-# Windows:
-.\.venv\Scripts\uvicorn app.main:app --reload --port 8000
-# Mac/Linux:
-# source .venv/bin/activate && uvicorn app.main:app --reload --port 8000
-```
+- [Assessment setup and API contract](docs/assessment-service.md)
+- [Personalized follow-ups and history](docs/personalized-learning.md)
+- [Separate hosting](docs/separate-hosting.md)
+- [Verification record](docs/assessment-verification.md)
 
----
-
-## 🗄️ Supabase Setup (Database & Storage)
-
-1. Go to [supabase.com](https://supabase.com) and create a free project.
-2. Open your project's **SQL Editor**.
-3. Copy the contents of [`supabase_setup.sql`](file:///c:/Users/user/Desktop/New%20folder/supabase_setup.sql) and paste it into the SQL Editor, then click **Run**.
-   - This creates the `app-storage` bucket with public storage policies.
-   - This creates the `documents` and `notes` PostgreSQL tables with Row Level Security (RLS).
-4. In Supabase Dashboard, navigate to **Project Settings → API** and copy:
-   - **Project URL**
-   - **anon / public key**
-   - **service_role key** (keep secret!)
-5. Paste these into `frontend/.env.local` and `backend/.env`.
-
----
-
-## 🤖 AI Provider Configuration (FastAPI)
-
-The FastAPI engine comes with a **built-in simulated fallback** so you can develop immediately without an API key!
-
-To enable live LLMs, open `backend/.env` and provide either:
-- `GEMINI_API_KEY=your_gemini_api_key` (Google AI Studio)
-- or `OPENAI_API_KEY=your_openai_api_key` (OpenAI)
-
-The FastAPI service will automatically detect the key and switch to live LLM generation.
-
----
-
-## 🧪 Available Endpoints
-
-### Next.js Backend Routes:
-- `GET /api/health` - Checks Next.js, Supabase, and FastAPI connectivity.
-- `GET /api/notes` & `POST /api/notes` - Supabase Database CRUD.
-- `POST /api/storage/upload` - Secure server-side file upload to Supabase Storage.
-- `GET /api/storage/files` - List files stored in Supabase Storage.
-- `POST /api/ai` - Next.js proxy route to Python FastAPI AI service.
-
-### FastAPI Python AI Routes:
-- `GET /health` - FastAPI status & configured providers.
-- `POST /api/ai/chat` - Multi-turn conversational completion.
-- `POST /api/ai/analyze` - NLP summarization, sentiment analysis, key point extraction.
-- `POST /api/ai/embeddings` - Vector embeddings generation for pgvector similarity search.
-- `POST /api/documents/process` - Fetches and summarizes documents directly from Supabase Storage.
+Checks: `npm run test:agentic`, `npm run build:frontend`, and `npm run lint` from `frontend/`.

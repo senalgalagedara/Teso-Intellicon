@@ -2,16 +2,23 @@ from fastapi import APIRouter, HTTPException
 from app.schemas import DocumentProcessRequest
 from app.services.supabase_service import supabase_service
 from app.services.ai_service import ai_service
+from app.config import settings
 
 router = APIRouter(prefix="/api/documents", tags=["Documents & Storage AI"])
 
 @router.post("/process")
 async def process_document_with_ai(request: DocumentProcessRequest):
+    bucket = request.bucket_name or settings.SUPABASE_STORAGE_BUCKET
+    if bucket != settings.SUPABASE_STORAGE_BUCKET or bucket == settings.ASSESSMENT_STORAGE_BUCKET:
+        raise HTTPException(403, 'Private assessment media requires assessment-session authorisation')
+    path = request.storage_path
+    if path.startswith('/') or any(part in ('', '.', '..') for part in path.split('/')) or any(c in path for c in ('\\', '%', ':', '?', '#')):
+        raise HTTPException(422, 'Invalid document storage path')
     if not supabase_service.is_configured:
         # Graceful response if Supabase credentials are still default
         return {
             "status": "simulated",
-            "message": "Supabase credentials not configured in backend/.env. Returning simulation result.",
+            "message": "Supabase credentials not configured in Agentic/.env. Returning simulation result.",
             "storage_path": request.storage_path,
             "action": request.action,
             "ai_result": f"Document at '{request.storage_path}' was analyzed for '{request.action}'. Key topics: Supabase Storage Integration, Full-stack Architecture, Python AI Pipeline."

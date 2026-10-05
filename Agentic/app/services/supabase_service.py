@@ -1,6 +1,7 @@
 from supabase import create_client, Client
 from typing import Optional, List, Dict, Any
 from app.config import settings
+from fastapi import HTTPException
 
 class SupabaseService:
     def __init__(self):
@@ -28,21 +29,27 @@ class SupabaseService:
         return self._client
 
     # Storage helpers
+    def legacy_bucket(self, bucket_name: Optional[str]) -> str:
+        bucket = bucket_name or self.bucket
+        if bucket != self.bucket or bucket == settings.ASSESSMENT_STORAGE_BUCKET:
+            raise HTTPException(403, 'Use authorised assessment media retrieval for private content')
+        return bucket
+
     async def list_files(self, bucket_name: Optional[str] = None, path: str = "") -> List[Dict[str, Any]]:
         client = self.get_client()
-        bucket = bucket_name or self.bucket
+        bucket = self.legacy_bucket(bucket_name)
         res = client.storage.from_(bucket).list(path)
         return res
 
     async def download_file(self, file_path: str, bucket_name: Optional[str] = None) -> bytes:
         client = self.get_client()
-        bucket = bucket_name or self.bucket
+        bucket = self.legacy_bucket(bucket_name)
         res = client.storage.from_(bucket).download(file_path)
         return res
 
     async def upload_file(self, file_path: str, file_bytes: bytes, content_type: str = "application/octet-stream", bucket_name: Optional[str] = None):
         client = self.get_client()
-        bucket = bucket_name or self.bucket
+        bucket = self.legacy_bucket(bucket_name)
         res = client.storage.from_(bucket).upload(
             path=file_path,
             file=file_bytes,
@@ -52,7 +59,7 @@ class SupabaseService:
 
     async def get_public_url(self, file_path: str, bucket_name: Optional[str] = None) -> str:
         client = self.get_client()
-        bucket = bucket_name or self.bucket
+        bucket = self.legacy_bucket(bucket_name)
         return client.storage.from_(bucket).get_public_url(file_path)
 
     # Database helpers

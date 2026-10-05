@@ -115,7 +115,7 @@ class AIService:
             f"**Full pipeline operational:**\n"
             f"1. ✅ Next.js Frontend successfully dispatched the request.\n"
             f"2. ✅ FastAPI server parsed the payload with Pydantic validation.\n"
-            f"3. 🔑 **To connect live LLMs**: Add `OPENAI_API_KEY` or `GEMINI_API_KEY` to `backend/.env`.\n\n"
+            f"3. 🔑 **To connect live LLMs**: Add `OPENAI_API_KEY` or `GEMINI_API_KEY` to `Agentic/.env`.\n\n"
             f"Currently running in simulated AI intelligence mode to let you develop and test immediately without external rate limits or keys!"
         )
         return {
