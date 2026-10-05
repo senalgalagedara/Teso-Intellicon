@@ -1,7 +1,7 @@
 import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextRequest } from "next/server";
-import { getAuth } from "./auth-server";
+import { getCurrentUser } from "./auth/dal";
 export const demoEnabled = () => process.env.NODE_ENV !== "production" && process.env.TESO_DEMO_MODE === "true";
 export function sign(value: string) {
   const secret = process.env.ASSESSMENT_BRIDGE_SECRET;
@@ -25,8 +25,8 @@ export function demoIdentity(req: NextRequest) {
 export async function assessmentIdentity(req: NextRequest) {
   const demo = demoIdentity(req);
   if (demo) return demo;
-  const { data: session } = await getAuth().getSession();
-  return session?.user ? { student_id: session.user.id, is_development: false } : null;
+  const user = await getCurrentUser();
+  return user?.role === "student" ? { student_id: user.id, is_development: false } : null;
 }
 export function sameOrigin(req: NextRequest) {
   try {

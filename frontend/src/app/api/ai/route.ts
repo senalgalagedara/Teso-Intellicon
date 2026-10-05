@@ -1,18 +1,35 @@
-import { NextRequest, NextResponse } from "next/server";
 import { fastapiBaseUrl } from "@/lib/fastapi-url";
+import { NextRequest, NextResponse } from "next/server";
 
+import { authorize, deny } from "@/lib/auth/dal";
+
+const ALLOWED_ACTIONS = ["chat", "analyze", "embeddings"] as const;
+
+type Action = (typeof ALLOWED_ACTIONS)[number];
+
+function isAction(value: unknown): value is Action {
+  return typeof value === "string" && (ALLOWED_ACTIONS as readonly string[]).includes(value);
+}
+
+/**
+ * Server-side proxy to the FastAPI AI engine. Any signed-in account may call
+ * it; the endpoint list is fixed here so the request cannot be pointed at an
+ * arbitrary FastAPI path.
+ */
 export async function POST(req: NextRequest) {
-  try {
-    const fastapiUrl = fastapiBaseUrl();
-    const body = await req.json();
-    const action = body.action || "chat"; // 'chat' | 'analyze' | 'embeddings'
+  const auth = await authorize(["student", "teacher_pending", "teacher", "admin"]);
 
-    let targetEndpoint = `${fastapiUrl}/api/ai/chat`;
-    if (action === "analyze") {
-      targetEndpoint = `${fastapiUrl}/api/ai/analyze`;
-    } else if (action === "embeddings") {
-      targetEndpoint = `${fastapiUrl}/api/ai/embeddings`;
-    }
+  if (!auth.ok) {
+    return deny(auth);
+  }
+
+  const fastapiUrl = fastapiBaseUrl();
+
+  try {
+    const body = await req.json();
+    const action = isAction(body.action) ? body.action : "chat";
+
+    const targetEndpoint = `${fastapiUrl}/api/ai/${action}`;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -20,7 +37,7 @@ export async function POST(req: NextRequest) {
     const response = await fetch(targetEndpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body.payload || body),
+      body: JSON.stringify(body.payload ?? body),
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
@@ -41,7 +58,7 @@ export async function POST(req: NextRequest) {
       {
         error: "Failed to communicate with FastAPI Python AI backend.",
         details: message,
-        hint: "Check FASTAPI_BASE_URL and the independently hosted Agentic service.",
+        hint: "Ensure FastAPI is running on http://127.0.0.1:8000 (run: uvicorn app.main:app --reload)",
       },
       { status: 503 }
     );

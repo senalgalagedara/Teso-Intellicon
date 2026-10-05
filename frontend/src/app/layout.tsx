@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Teso | Learning & self-assessment",
-  description: "Student self-assessment, saved results and evidence-based study feedback.",
+  title: "Teso Intellicon",
+  description:
+    "Course platform where students join by invitation and teacher accounts are approved by an admin.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
