@@ -11,12 +11,14 @@ from app.assessment.provider import (get_provider, ProviderFailure, reviewed_fee
 from app.assessment.storage import Storage, MediaError
 from app.assessment.service import question_rows
 
-def claim(engine):
+def claim(engine, session_id=None):
     now = time.time()
     with db.begin(engine) as conn:
         try:
             eligible = or_(and_(db.jobs.c.state == 'queued', db.jobs.c.available_at <= now), and_(db.jobs.c.state == 'processing', db.jobs.c.lease_until < now))
-            q = select(db.jobs).where(eligible).order_by(db.jobs.c.available_at).limit(1)
+            q = select(db.jobs).where(eligible)
+            if session_id: q = q.where(db.jobs.c.session_id == session_id)
+            q = q.order_by(db.jobs.c.available_at).limit(1)
             if conn.dialect.name == 'postgresql': q = q.with_for_update(skip_locked=True)
             job = conn.execute(q).mappings().first()
             if not job:
@@ -36,10 +38,10 @@ def renew(conn, job):
         raise ProviderFailure('lost_job_lease')
     conn.execute(db.jobs.update().where(db.jobs.c.id == job['id']).values(lease_until=time.time() + settings.JOB_LEASE_SECONDS))
 
-async def process_one(engine=db.engine, provider=None, storage=None):
+async def process_one(engine=db.engine, provider=None, storage=None, *, session_id=None):
     provider = provider or get_provider()
     storage = storage or Storage()
-    job = claim(engine)
+    job = claim(engine, session_id=session_id)
     if not job: return False
     try:
         await process_claimed(engine, job, provider, storage)

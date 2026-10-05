@@ -40,12 +40,14 @@ NEON_AUTH_BASE_URL=your-neon-auth-endpoint
 NEON_AUTH_COOKIE_SECRET=your-random-cookie-secret-at-least-32-characters
 TESO_DEMO_MODE=false
 ASSESSMENT_STORAGE_BUCKET=teso-assessments
+DATABASE_URL=postgresql://USER:PASSWORD@NEON_HOST/neondb?sslmode=require
 ```
 
 `FASTAPI_BASE_URL` is the Python service's HTTPS origin without an `/api` suffix,
 query, credentials, or path prefix. All Next.js Python proxies use this single
 server-only setting. Production requires it; it does not fall back to localhost.
-`AI_API_KEY` and `DATABASE_URL` are not needed on the Next.js host. Next.js still
+`AI_API_KEY` stays on the Python host. The Next.js host needs its server-only
+`DATABASE_URL` for the team roles/courses schema, along with Neon Auth. Next.js still
 needs its server runtime for authentication and the signed assessment proxy;
 this is not a static-only export.
 

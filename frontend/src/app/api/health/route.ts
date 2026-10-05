@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 
 import { query } from "@/lib/db/client";
 
-const fastapiUrl = fastapiBaseUrl();
 
 export async function GET() {
   const authConfigured = Boolean(
@@ -15,14 +14,16 @@ export async function GET() {
   try {
     const rows = await query<{ ok: number }>`SELECT 1 AS ok`;
     databaseStatus = rows[0]?.ok === 1 ? "connected" : "unexpected_response";
-  } catch (err: unknown) {
-    databaseStatus = err instanceof Error ? err.message : "connection_failed";
+  } catch {
+    databaseStatus = "connection_failed";
   }
 
+  let fastapiUrl = "not_configured";
   let fastApiStatus = "unreachable";
   let fastApiDetails: Record<string, unknown> = {};
 
   try {
+    fastapiUrl = fastapiBaseUrl();
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2000);
     const res = await fetch(`${fastapiUrl}/health`, {

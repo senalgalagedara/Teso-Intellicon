@@ -3,7 +3,7 @@ import uuid
 from typing import Literal
 from fastapi import HTTPException
 from pydantic import Field, model_validator
-from sqlalchemy import select, and_
+from sqlalchemy import select, func, case
 from app.config import settings
 from app.assessment import db
 from app.assessment.auth import Identity
@@ -37,14 +37,23 @@ def question_rows(conn, session_id):
     return list(conn.execute(select(db.questions.c.content).join(db.presented, db.presented.c.question_id == db.questions.c.id).where(db.presented.c.session_id == session_id).order_by(db.presented.c.position)).scalars())
 
 def paper_list(conn, identity):
-    return [{'id': p['id'], 'title': p['title'], 'version': p['version'], 'is_development': p['is_development'], 'question_count': len(p['question_ids'])} for p in conn.execute(select(db.papers.c.content)).scalars() if not p['is_development'] or (settings.ALLOW_DEVELOPMENT_CONTENT and identity.is_development)]
+    papers = [p for p in conn.execute(select(db.papers.c.content)).scalars() if not p['is_development'] or (settings.ALLOW_DEVELOPMENT_CONTENT and identity.is_development)]
+    subjects = {r['question_id']: r for r in conn.execute(select(db.questions.c.id.label('question_id'), db.subjects.c.id.label('subject_id'), db.subjects.c.name).select_from(db.questions).join(db.concepts).join(db.units).join(db.subjects).where(db.questions.c.id.in_([p['question_ids'][0] for p in papers]))).mappings()}
+    return [dict(id=p['id'], title=p['title'], version=p['version'], is_development=p['is_development'], question_count=len(p['question_ids']), subject_id=subjects[p['question_ids'][0]]['subject_id'], subject_name=subjects[p['question_ids'][0]]['name'], content_language=p.get('content_language', 'en')) for p in papers]
 
-def start(engine, identity, request):
+def start(engine, identity, request, *, plan=None):
     with db.begin(engine) as conn:
         try:
             p = conn.execute(select(db.papers.c.content).where(db.papers.c.id == request.paper_id)).scalar_one_or_none()
             if not p or (p['is_development'] and not (settings.ALLOW_DEVELOPMENT_CONTENT and identity.is_development)):
                 raise HTTPException(404, 'Published paper not found')
+            if plan:
+                owned(conn, plan['source_session_id'], identity, lock=True)
+                previous = conn.execute(select(db.plans.c.session_id).where(db.plans.c.source_session_id == plan['source_session_id'])).scalar_one_or_none()
+                if previous:
+                    status = owned(conn, previous, identity)['status']
+                    conn.commit()
+                    return {'session_id': previous, 'status': status}
             # Lock the paper row to serialize first identity insertion on PostgreSQL.
             conn.execute(select(db.papers.c.id).where(db.papers.c.id == request.paper_id).with_for_update()).first()
             if not conn.execute(select(db.students.c.id).where(db.students.c.id == identity.student_id)).first():
@@ -54,8 +63,9 @@ def start(engine, identity, request):
                 else:
                     conn.execute(db.students.insert().values(id=identity.student_id, is_development=identity.is_development))
             sid = str(uuid.uuid4())
-            conn.execute(db.sessions.insert().values(id=sid, student_id=identity.student_id, paper_id=p['id'], status='in_progress', language=request.language, activity_type='independent_assessment', is_development=identity.is_development or p['is_development'], started_at=time.time()))
-            conn.execute(db.presented.insert(), [{'session_id': sid, 'question_id': q, 'position': i} for i, q in enumerate(p['question_ids'])])
+            conn.execute(db.sessions.insert().values(id=sid, student_id=identity.student_id, paper_id=p['id'], status='in_progress', language=request.language, activity_type='adaptive_practice' if plan else 'independent_assessment', is_development=identity.is_development or p['is_development'], started_at=time.time()))
+            conn.execute(db.presented.insert(), [{'session_id': sid, 'question_id': q, 'position': i} for i, q in enumerate(plan['question_ids'] if plan else p['question_ids'])])
+            if plan: conn.execute(db.plans.insert().values(session_id=sid, source_session_id=plan['source_session_id'], content=plan))
             conn.commit()
             return {'session_id': sid, 'status': 'in_progress'}
         except BaseException:
@@ -69,7 +79,8 @@ def exam(conn, sid, identity):
     def display(q):
         return {'id': q['id'], 'version': q['version'], 'text': q['text'], 'marks': q['marks'], 'media_ids': q['media_ids'],
                 'options': [{'id': o['id'], 'text': o['text'], 'media_ids': o['media_ids']} for o in q['options']]}
-    return {'session_id': sid, 'status': s['status'], 'language': s['language'], 'questions': [display(q) for q in qs], 'drafts': drafts, 'is_development': s['is_development']}
+    plan = conn.execute(select(db.plans.c.content).where(db.plans.c.session_id == sid)).scalar_one_or_none()
+    return {'plan': plan, 'session_id': sid, 'status': s['status'], 'language': s['language'], 'questions': [display(q) for q in qs], 'drafts': drafts, 'is_development': s['is_development']}
 
 def save_answers(engine, sid, identity, request, final=False):
     with db.begin(engine) as conn:
@@ -114,6 +125,8 @@ def save_answers(engine, sid, identity, request, final=False):
                 score = {**counts, 'awarded_marks': awarded, 'total_marks': total, 'percentage': round(100 * awarded / total, 2)}
                 conn.execute(db.sessions.update().where(db.sessions.c.id == sid).values(status='submitted', submitted_at=now, score=score))
                 conn.execute(db.jobs.insert().values(id=str(uuid.uuid4()), session_id=sid, state='queued', attempts=0, available_at=now))
+                from app.assessment.learning import save_record
+                save_record(conn, sid)
                 result = submission(conn, sid, {'score': score})
             else:
                 result = {'session_id': sid, 'status': 'draft_saved'}
@@ -127,21 +140,19 @@ def submission(conn, sid, session):
     job = conn.execute(select(db.jobs).where(db.jobs.c.session_id == sid)).mappings().one()
     return {'session_id': sid, 'score': session['score'], 'analysis_status': job['state'], 'job_id': job['id']}
 
+def success_rates(conn, qids, activity_type='independent_assessment'):
+    first = select(db.answers.c.question_id, db.answers.c.correct, db.sessions.c.activity_type, db.answers.c.hint_exposed, db.answers.c.solution_exposed,
+        func.row_number().over(partition_by=[db.sessions.c.student_id, db.answers.c.question_id], order_by=[db.sessions.c.submitted_at, db.sessions.c.id]).label('position')).join(db.sessions, db.sessions.c.id == db.answers.c.session_id).where(db.answers.c.question_id.in_(qids), db.answers.c.is_final.is_(True), db.sessions.c.is_development.is_(False)).subquery()
+    rates = {r['question_id']: r for r in conn.execute(select(first.c.question_id, func.count().label('denominator'), func.sum(case((first.c.correct.is_(True), 1), else_=0)).label('numerator')).where(first.c.position == 1, first.c.activity_type == activity_type, first.c.hint_exposed.is_not(True), first.c.solution_exposed.is_not(True)).group_by(first.c.question_id)).mappings()}
+    output = {}
+    for qid in qids:
+        row = rates.get(qid, {})
+        n, numerator = row.get('denominator', 0), row.get('numerator', 0)
+        output[qid] = dict(population='First finalized response per student and question version, eligible only if independent and without known hint or solution exposure; prior practice and development data excluded; unanswered included in denominator.', activity_type=activity_type, numerator=numerator, denominator=n, percentage=round(100*numerator/n, 2) if n else None, sample_label='no_data' if not n else 'small_sample' if n < 30 else 'available')
+    return output
+
 def success_rate(conn, qid, activity_type='independent_assessment'):
-    # First finalized presentation per student/version, including unanswered.
-    rows = conn.execute(select(db.sessions.c.student_id, db.answers.c.correct, db.answers.c.selected_option)
-        .join(db.answers, db.answers.c.session_id == db.sessions.c.id)
-        .where(db.answers.c.question_id == qid, db.answers.c.is_final.is_(True), db.sessions.c.is_development.is_(False), db.sessions.c.activity_type == activity_type,
-               db.answers.c.hint_exposed.is_not(True), db.answers.c.solution_exposed.is_not(True))
-        .order_by(db.sessions.c.submitted_at, db.sessions.c.id)).mappings()
-    first = {}
-    for r in rows:
-        first.setdefault(r['student_id'], r)
-    n = len(first)
-    numerator = sum(r['correct'] is True for r in first.values())
-    return {'population': 'First finalized independent assessments per student and question version; development data excluded; unanswered included in denominator.',
-            'activity_type': activity_type, 'numerator': numerator, 'denominator': n, 'percentage': round(100 * numerator / n, 2) if n else None,
-            'sample_label': 'no_data' if not n else ('small_sample' if n < 30 else 'available')}
+    return success_rates(conn, [qid], activity_type)[qid]
 
 def results(conn, sid, identity):
     s = owned(conn, sid, identity)
@@ -149,22 +160,26 @@ def results(conn, sid, identity):
     qs = question_rows(conn, sid)
     answer_map = {a['question_id']: dict(a) for a in conn.execute(select(db.answers).where(db.answers.c.session_id == sid)).mappings()}
     feedback = {a['question_id']: a['content'] for a in conn.execute(select(db.analyses).where(db.analyses.c.session_id == sid).order_by(db.analyses.c.analysis_version)).mappings()}
+    concept_map = {c['id']: c for c in conn.execute(select(db.concepts).where(db.concepts.c.id.in_({q['concept_id'] for q in qs}))).mappings()}
+    unit_map = {u['id']: u for u in conn.execute(select(db.units).where(db.units.c.id.in_({c['unit_id'] for c in concept_map.values()}))).mappings()}
+    resource_map = {r['id']: r['content'] for r in conn.execute(select(db.resources).where(db.resources.c.id.in_({rid for q in qs for rid in q['resource_ids']}))).mappings()}
+    rates = success_rates(conn, [q['id'] for q in qs])
     breakdown, reviews = {}, []
     for q in qs:
         a = answer_map[q['id']]
         status = 'unanswered' if a['selected_option'] is None else ('correct' if a['correct'] else 'incorrect')
         cid = q['concept_id']
         if cid not in breakdown:
-            c = conn.execute(select(db.concepts).where(db.concepts.c.id == cid)).mappings().one()
-            u = conn.execute(select(db.units).where(db.units.c.id == c['unit_id'])).mappings().one()
+            c = concept_map[cid]
+            u = unit_map[c['unit_id']]
             breakdown[cid] = {'concept_id': cid, 'concept_name': c['name'], 'unit_id': u['id'], 'unit_name': u['name'], 'correct': 0, 'incorrect': 0, 'unanswered': 0, 'awarded_marks': 0, 'total_marks': 0, 'evidence_question_ids': []}
         b = breakdown[cid]
         b[status] += 1
         b['awarded_marks'] += a['marks']
         b['total_marks'] += q['marks']
         b['evidence_question_ids'].append(q['id'])
-        reviews.append({'question': q, 'answer': a, 'success_rate': success_rate(conn, q['id']), 'analysis': feedback.get(q['id']),
-                        'base_explanation': q['base_explanation'], 'resources': [conn.execute(select(db.resources.c.content).where(db.resources.c.id == rid)).scalar_one() for rid in q['resource_ids']]})
+        reviews.append({'question': q, 'answer': a, 'success_rate': rates[q['id']], 'analysis': feedback.get(q['id']),
+                        'base_explanation': q['base_explanation'], 'resources': [resource_map[rid] for rid in q['resource_ids']]})
     for b in breakdown.values():
         b['percentage'] = round(100 * b['awarded_marks'] / b['total_marks'], 2)
         b['recommendation'] = ('Revise using these incorrect responses as limited evidence.' if b['incorrect'] else ('Attempt the unanswered questions; no misconception is inferred.' if b['unanswered'] else 'Correct on the questions in this assessment; continue reviewing.'))

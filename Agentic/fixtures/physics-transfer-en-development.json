@@ -1,0 +1,358 @@
+{
+  "subjects": [
+    {
+      "id": "physics-dev",
+      "name": "Physics (development)"
+    }
+  ],
+  "units": [
+    {
+      "id": "mechanics-dev",
+      "subject_id": "physics-dev",
+      "name": "Mechanics"
+    },
+    {
+      "id": "waves-dev",
+      "subject_id": "physics-dev",
+      "name": "Waves"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "force-dev",
+      "unit_id": "mechanics-dev",
+      "name": "Newton's second law"
+    },
+    {
+      "id": "speed-dev",
+      "unit_id": "mechanics-dev",
+      "name": "Average speed"
+    },
+    {
+      "id": "wave-speed-dev",
+      "unit_id": "waves-dev",
+      "name": "Wave speed"
+    }
+  ],
+  "resources": [
+    {
+      "id": "force-theory-dev-v1",
+      "version": 1,
+      "concept_id": "force-dev",
+      "title": "Development theory: force and acceleration",
+      "theory": "For constant mass, net force F = ma. Acceleration is net force divided by mass. The SI units are N for force, kg for mass, and m/s² for acceleration.",
+      "url": null
+    },
+    {
+      "id": "speed-theory-dev-v1",
+      "version": 1,
+      "concept_id": "speed-dev",
+      "title": "Development theory: average speed",
+      "theory": "Average speed is total distance divided by elapsed time. It is a scalar measured in m/s. Use distance, not displacement, for average speed.",
+      "url": null
+    },
+    {
+      "id": "wave-theory-dev-v1",
+      "version": 1,
+      "concept_id": "wave-speed-dev",
+      "title": "Development theory: wave equation",
+      "theory": "Wave speed v = fλ, where f is frequency in Hz and λ is wavelength in metres. Multiplying Hz by metres gives m/s.",
+      "url": null
+    }
+  ],
+  "media": [],
+  "questions": [
+    {
+      "id": "force-dev-transfer-en-1-v1",
+      "version": 1,
+      "text": "A net force of 12 N acts on an object of mass 3 kg. What is its acceleration?",
+      "options": [
+        {
+          "id": "a",
+          "text": "4 m/s²"
+        },
+        {
+          "id": "b",
+          "text": "36 m/s²"
+        },
+        {
+          "id": "c",
+          "text": "0.25 m/s²"
+        }
+      ],
+      "correct_option_id": "a",
+      "marks": 2,
+      "concept_id": "force-dev",
+      "resource_ids": [
+        "force-theory-dev-v1"
+      ],
+      "base_explanation": "Using the theory: a = F/m = 12 / 3 = 4 m/s².",
+      "numeric_result": {
+        "value": 4.0,
+        "unit": "m/s²"
+      }
+    },
+    {
+      "id": "force-dev-transfer-en-2-v1",
+      "version": 1,
+      "text": "A net force of 20 N acts on an object of mass 5 kg. What is its acceleration?",
+      "options": [
+        {
+          "id": "a",
+          "text": "100 m/s²"
+        },
+        {
+          "id": "b",
+          "text": "0.25 m/s²"
+        },
+        {
+          "id": "c",
+          "text": "4 m/s²"
+        }
+      ],
+      "correct_option_id": "c",
+      "marks": 2,
+      "concept_id": "force-dev",
+      "resource_ids": [
+        "force-theory-dev-v1"
+      ],
+      "base_explanation": "Using the theory: a = F/m = 20 / 5 = 4 m/s².",
+      "numeric_result": {
+        "value": 4.0,
+        "unit": "m/s²"
+      }
+    },
+    {
+      "id": "force-dev-transfer-en-3-v1",
+      "version": 1,
+      "text": "A net force of 18 N acts on an object of mass 2 kg. What is its acceleration?",
+      "options": [
+        {
+          "id": "a",
+          "text": "0.1111 m/s²"
+        },
+        {
+          "id": "b",
+          "text": "9 m/s²"
+        },
+        {
+          "id": "c",
+          "text": "36 m/s²"
+        }
+      ],
+      "correct_option_id": "b",
+      "marks": 2,
+      "concept_id": "force-dev",
+      "resource_ids": [
+        "force-theory-dev-v1"
+      ],
+      "base_explanation": "Using the theory: a = F/m = 18 / 2 = 9 m/s².",
+      "numeric_result": {
+        "value": 9.0,
+        "unit": "m/s²"
+      }
+    },
+    {
+      "id": "speed-dev-transfer-en-1-v1",
+      "version": 1,
+      "text": "A student travels a total distance of 36 m in 6 s. What is the average speed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "6 m/s"
+        },
+        {
+          "id": "b",
+          "text": "216 m/s"
+        },
+        {
+          "id": "c",
+          "text": "0.1667 m/s"
+        }
+      ],
+      "correct_option_id": "a",
+      "marks": 1,
+      "concept_id": "speed-dev",
+      "resource_ids": [
+        "speed-theory-dev-v1"
+      ],
+      "base_explanation": "Using the theory: v = distance/time = 36 / 6 = 6 m/s.",
+      "numeric_result": {
+        "value": 6.0,
+        "unit": "m/s"
+      }
+    },
+    {
+      "id": "speed-dev-transfer-en-2-v1",
+      "version": 1,
+      "text": "A student travels a total distance of 42 m in 7 s. What is the average speed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "294 m/s"
+        },
+        {
+          "id": "b",
+          "text": "0.1667 m/s"
+        },
+        {
+          "id": "c",
+          "text": "6 m/s"
+        }
+      ],
+      "correct_option_id": "c",
+      "marks": 1,
+      "concept_id": "speed-dev",
+      "resource_ids": [
+        "speed-theory-dev-v1"
+      ],
+      "base_explanation": "Using the theory: v = distance/time = 42 / 7 = 6 m/s.",
+      "numeric_result": {
+        "value": 6.0,
+        "unit": "m/s"
+      }
+    },
+    {
+      "id": "speed-dev-transfer-en-3-v1",
+      "version": 1,
+      "text": "A student travels a total distance of 60 m in 12 s. What is the average speed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "0.2 m/s"
+        },
+        {
+          "id": "b",
+          "text": "5 m/s"
+        },
+        {
+          "id": "c",
+          "text": "720 m/s"
+        }
+      ],
+      "correct_option_id": "b",
+      "marks": 1,
+      "concept_id": "speed-dev",
+      "resource_ids": [
+        "speed-theory-dev-v1"
+      ],
+      "base_explanation": "Using the theory: v = distance/time = 60 / 12 = 5 m/s.",
+      "numeric_result": {
+        "value": 5.0,
+        "unit": "m/s"
+      }
+    },
+    {
+      "id": "wave-speed-dev-transfer-en-1-v1",
+      "version": 1,
+      "text": "A wave has frequency 4 Hz and wavelength 3 m. What is its speed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "12 m/s"
+        },
+        {
+          "id": "b",
+          "text": "1.333 m/s"
+        },
+        {
+          "id": "c",
+          "text": "0.75 m/s"
+        }
+      ],
+      "correct_option_id": "a",
+      "marks": 2,
+      "concept_id": "wave-speed-dev",
+      "resource_ids": [
+        "wave-theory-dev-v1"
+      ],
+      "base_explanation": "Using the theory: v = fλ = 4 × 3 = 12 m/s.",
+      "numeric_result": {
+        "value": 12,
+        "unit": "m/s"
+      }
+    },
+    {
+      "id": "wave-speed-dev-transfer-en-2-v1",
+      "version": 1,
+      "text": "A wave has frequency 8 Hz and wavelength 0.5 m. What is its speed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "16 m/s"
+        },
+        {
+          "id": "b",
+          "text": "0.0625 m/s"
+        },
+        {
+          "id": "c",
+          "text": "4 m/s"
+        }
+      ],
+      "correct_option_id": "c",
+      "marks": 2,
+      "concept_id": "wave-speed-dev",
+      "resource_ids": [
+        "wave-theory-dev-v1"
+      ],
+      "base_explanation": "Using the theory: v = fλ = 8 × 0.5 = 4 m/s.",
+      "numeric_result": {
+        "value": 4.0,
+        "unit": "m/s"
+      }
+    },
+    {
+      "id": "wave-speed-dev-transfer-en-3-v1",
+      "version": 1,
+      "text": "A wave has frequency 6 Hz and wavelength 2 m. What is its speed?",
+      "options": [
+        {
+          "id": "a",
+          "text": "0.3333 m/s"
+        },
+        {
+          "id": "b",
+          "text": "12 m/s"
+        },
+        {
+          "id": "c",
+          "text": "3 m/s"
+        }
+      ],
+      "correct_option_id": "b",
+      "marks": 2,
+      "concept_id": "wave-speed-dev",
+      "resource_ids": [
+        "wave-theory-dev-v1"
+      ],
+      "base_explanation": "Using the theory: v = fλ = 6 × 2 = 12 m/s.",
+      "numeric_result": {
+        "value": 12,
+        "unit": "m/s"
+      }
+    }
+  ],
+  "paper": {
+    "id": "physics-transfer-en-development-v1",
+    "version": 1,
+    "title": "Physics - EN development practice bank",
+    "status": "published",
+    "review_status": "development_fixture",
+    "is_development": true,
+    "question_ids": [
+      "force-dev-transfer-en-1-v1",
+      "force-dev-transfer-en-2-v1",
+      "force-dev-transfer-en-3-v1",
+      "speed-dev-transfer-en-1-v1",
+      "speed-dev-transfer-en-2-v1",
+      "speed-dev-transfer-en-3-v1",
+      "wave-speed-dev-transfer-en-1-v1",
+      "wave-speed-dev-transfer-en-2-v1",
+      "wave-speed-dev-transfer-en-3-v1"
+    ],
+    "marking_rule": "single_answer_no_penalty",
+    "subject_id": "physics-dev",
+    "content_language": "en"
+  }
+}

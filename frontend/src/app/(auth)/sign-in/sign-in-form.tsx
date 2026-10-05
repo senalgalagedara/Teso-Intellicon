@@ -30,7 +30,8 @@ export function SignInForm() {
 
     // replace() so the browser Back button does not return to a page that
     // expects a session. refresh() picks up the server-rendered role.
-    router.replace("/dashboard");
+    const next = new URLSearchParams(window.location.search).get("next");
+    router.replace(next === "/exams/self-assessment" ? next : "/dashboard");
     router.refresh();
   }
 

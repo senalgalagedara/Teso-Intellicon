@@ -13,7 +13,7 @@ from app.assessment.provider import get_provider, ProviderFailure
 from app.assessment.worker import process_one
 
 def migrate(engine):
-    # Initial additive migration, matching migrations/001_assessments.sql.
+    # Additive migrations 001/002; version 2 backfills saved learning evidence.
     # No auto migration on API startup; no changes to existing application tables.
     with engine.begin() as conn:
         if conn.dialect.name == 'postgresql': conn.execute(text('SELECT pg_advisory_xact_lock(74637601)'))
@@ -24,12 +24,18 @@ def migrate(engine):
                 conn.execute(text(f'REVOKE ALL ON "{table.name}" FROM PUBLIC'))
         if not conn.execute(select(db.schema_versions.c.version).where(db.schema_versions.c.version == 1)).first():
             conn.execute(db.schema_versions.insert().values(version=1))
+        if not conn.execute(select(db.schema_versions.c.version).where(db.schema_versions.c.version == 2)).first():
+            from app.assessment.learning import save_record
+            for sid in conn.execute(select(db.sessions.c.id).where(db.sessions.c.status == 'submitted')).scalars().all():
+                save_record(conn, sid)
+            conn.execute(db.schema_versions.insert().values(version=2))
 
 def ddl():
     statements = []
     engine = create_mock_engine('postgresql+psycopg://', lambda sql, *args, **kw: statements.append(str(sql.compile(dialect=engine.dialect)).strip() + ';'))
-    db.metadata.create_all(engine)
-    for table in db.metadata.sorted_tables:
+    initial = [t for t in db.metadata.sorted_tables if t not in (db.plans, db.learning_records)]
+    db.metadata.create_all(engine, tables=initial)
+    for table in initial:
         statements += [f'ALTER TABLE "{table.name}" ENABLE ROW LEVEL SECURITY;', f'REVOKE ALL ON "{table.name}" FROM PUBLIC;']
     statements.append('INSERT INTO teso_schema_versions (version) VALUES (1) ON CONFLICT DO NOTHING;')
     return '-- Initial additive assessment schema. Run through CLI migrate, once per database.\n' + '\n\n'.join(statements) + '\n'
@@ -55,7 +61,7 @@ def main():
     live = sub.add_parser('smoke'); live.add_argument('path', nargs='?', default='fixtures/physics-development.json')
     sub.add_parser('work-once')
     args = parser.parse_args()
-    if args.command == 'migrate': migrate(db.engine); print('Assessment migration 001 applied (additive).')
+    if args.command == 'migrate': migrate(db.engine); print('Assessment migrations 001 and 002 applied (additive; learning history backfilled).')
     elif args.command == 'ddl': print(ddl())
     elif args.command == 'import-content':
         p = Package.model_validate_json(Path(args.path).read_text(encoding='utf-8'))

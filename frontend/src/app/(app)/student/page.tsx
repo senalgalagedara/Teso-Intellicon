@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { respondToInviteAction } from "@/app/actions/student";
 import { ActionForm } from "@/components/action-form";
 import { requireRole } from "@/lib/auth/guards";
@@ -22,6 +23,7 @@ export default async function StudentCoursesPage() {
         </p>
       </div>
 
+      <section className="glass-card" style={{marginBottom: 24}}><h2 className="card-title">Your learning journey</h2><p className="muted">Take a paper, revise missed theory, and compare your topic progress over time.</p><Link href="/exams/self-assessment" className="btn btn-primary">Self-assessment &amp; learning history</Link></section>
       <section>
         <h2 className="section-title">Invitations ({invited.length})</h2>
 

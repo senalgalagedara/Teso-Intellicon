@@ -2,8 +2,8 @@
 
 This milestone extends the existing FastAPI and Next.js applications. Python owns
 assessment content, grading, statistics, and durable analysis jobs in Neon
-PostgreSQL. Neon Auth resolves student identity in Next.js. The existing Supabase
-SDK remains the storage provider; assessment media requires a **separate private
+PostgreSQL. Neon Auth resolves student identity in Next.js. The Python Supabase
+SDK remains the private media storage provider; assessment media requires a **separate private
 bucket**, not the template's public `app-storage` bucket.
 
 The supplied local credentials have been configured in ignored `Agentic/.env` and
@@ -23,6 +23,9 @@ cd Agentic
 # Use DATABASE_URL for Neon. SQLite is an explicit local development alternative.
 .\.venv\Scripts\python.exe -m app.assessment.cli migrate
 .\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-development.json
+.\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-transfer-en-development.json
+.\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-transfer-si-development.json
+.\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-transfer-ta-development.json
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
@@ -42,8 +45,8 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000/exams/self-assessment`. The homepage links to Exams,
-then to self-assessment and available papers. Save a draft, complete the paper,
+Open `http://localhost:3000/exams/self-assessment`. The homepage links to self-assessment,
+then subject, paper language and available papers. Save a draft, complete the paper,
 submit, and reopen the saved result using its `?session=...` URL or the saved
 assessments list. Analysis is polled while queued/processing. Scores and base
 explanations remain available if analysis fails.
@@ -56,11 +59,14 @@ explanations remain available if analysis fails.
 Set `NEON_AUTH_BASE_URL` and `NEON_AUTH_COOKIE_SECRET` in the frontend. Sign-in
 and student sign-up use the installed Neon Auth SDK and its server route handler.
 Configure email verification and allowed app origins in Neon before using real
-accounts. Existing identities are used; no teacher/admin workflow was added.
+accounts. Existing identities and student roles are resolved through the team auth DAL; the
+merged frontend preserves teacher/admin workflows. `DATABASE_URL` is needed in
+Next.js for those role/course queries. Apply `frontend/migrations/0001_app_schema.sql`
+on a fresh Auth-enabled branch before sign-in.
 
 Generate a random `ASSESSMENT_BRIDGE_SECRET` of at least 32 characters and set the
 same value in both server environment files. Next.js obtains the user through
-`getSession()`, then sends a 60-second HMAC assertion bound to the HTTP method,
+`getCurrentUser()` and verifies the student role, then sends a 60-second HMAC assertion bound to the HTTP method,
 path, and SHA-256 body digest. Python rejects client-supplied student IDs, scores,
 answer keys, and unsupported fields. All session reads/writes check ownership.
 Use HTTPS/private service networking outside local development.
@@ -106,7 +112,8 @@ null. Preferred feedback language supports `en`, `si`, `ta`; reviewed fallbacks
 retain the source content language and are labelled accordingly.
 
 Source content is evidence, never executable instructions. No embeddings, web
-browsing, model training, BKT, FSRS or adaptive practice were added. Semantic
+browsing, model training, BKT or FSRS were added. Adaptive practice is now
+available through the explicit selection strategy in the personalized learning guide. Semantic
 correctness of all free-text reasoning cannot be proved by a JSON schema; the
 MVP validates IDs, explicit numeric results and units, and model contradiction
 flags. Human content review remains required.
@@ -266,3 +273,10 @@ duplicate/concurrent submissions, durable retries/recovery, no exam leakage,
 first-response rates, no-data/small samples, structured feedback grounding,
 timeouts and reviewed fallback, storage restrictions, and persistence after
 engine restart.
+
+## Personalized follow-ups and history
+
+The expanded flow is documented in [personalized learning](personalized-learning.md).
+It adds saved concept evidence, improvement timelines, and adaptive practice from
+published question versions. This supersedes the first milestone restriction on
+adaptive practice; teacher/admin UI remains the team implementation from main.

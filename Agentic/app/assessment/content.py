@@ -93,6 +93,8 @@ class Paper(Strict):
     review_status: Literal['reviewed', 'development_fixture']
     is_development: bool
     question_ids: list[Id] = Field(min_length=1, max_length=200)
+    subject_id: Id | None = None
+    content_language: Literal['en', 'si', 'ta'] = 'en'
     marking_rule: Literal['single_answer_no_penalty']
 
 class Package(Strict):
@@ -137,6 +139,9 @@ class Package(Strict):
             object_roles[m.object_key] = m.role
         if len(set(self.paper.question_ids)) != len(self.paper.question_ids) or set(self.paper.question_ids) != set(maps['questions']):
             raise ValueError('Paper membership must contain each package question exactly once')
+        subject_ids = {maps['units'][maps['concepts'][q.concept_id].unit_id].subject_id for q in self.questions}
+        if len(subject_ids) != 1 or (self.paper.subject_id and self.paper.subject_id not in subject_ids):
+            raise ValueError('A paper must belong to one matching subject')
         if self.paper.is_development != (self.paper.review_status == 'development_fixture'):
             raise ValueError('Development fixtures cannot claim expert review')
         return self
@@ -170,6 +175,10 @@ def import_package(engine, package: Package, storage):
                 conn.execute(db.options.insert(), [{'question_id': q.id, 'id': o.id, 'content': o.model_dump()} for o in q.options])
                 conn.execute(db.keys.insert().values(question_id=q.id, option_id=q.correct_option_id))
         exists = conn.execute(select(db.papers.c.id).where(db.papers.c.id == package.paper.id)).first()
-        immutable(db.papers, {'id': package.paper.id, 'content': package.paper.model_dump()})
+        paper_content = package.paper.model_dump()
+        if exists:
+            stored = conn.execute(select(db.papers.c.content).where(db.papers.c.id == package.paper.id)).scalar_one()
+            if Paper.model_validate(stored).model_dump() == paper_content: paper_content = stored
+        immutable(db.papers, {'id': package.paper.id, 'content': paper_content})
         if not exists:
             conn.execute(db.composition.insert(), [{'paper_id': package.paper.id, 'question_id': qid, 'position': i} for i, qid in enumerate(package.paper.question_ids)])

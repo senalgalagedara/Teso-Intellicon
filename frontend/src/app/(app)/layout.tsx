@@ -58,7 +58,7 @@ function RoleNav({ role }: { role: string }) {
   const links: { href: string; label: string }[] = [{ href: "/dashboard", label: "Overview" }];
 
   if (role === "student") {
-    links.push({ href: "/student", label: "My courses" });
+    links.push({ href: "/student", label: "My courses" }, { href: "/exams/self-assessment", label: "Self-assessment" });
   }
 
   if (role === "teacher") {

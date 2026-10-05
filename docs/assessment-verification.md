@@ -48,3 +48,15 @@ earlier live-provider verification remains recorded above.
 The container definition is provided but not build-tested: Docker Desktop's
 Linux daemon was unavailable in this session. No external hosting deployment
 was performed.
+
+
+## Main frontend integration and personalized learning
+
+- Pulled and merged `origin/main` into `Nraj_Dev`, preserving the team Neon Auth, role guards, teacher approvals, courses and invitations. Assessment requests now use the same student role DAL.
+- 74 automated tests pass, including adaptive topic coverage, fresh/repeated questions, content language boundaries, stable concurrent follow-up creation, saved history after reconnecting, improvement evidence, migration backfill, and targeted demo worker isolation.
+- Next.js production build and ESLint pass. The workspace-root warning is resolved. Independent deployment URL validation runs at request time and does not block a local production build.
+- Additive migration 002 and English/Sinhala/Tamil development banks applied to the configured Neon database. Team role/course tables are present and preserved.
+- HTTP integration with a server-issued development identity passed through Next.js and Python using Neon: initial paper 2/5 (40%); personalized follow-up 7/7 (100%) on five fresh questions; two saved history entries with topic improvement; repeated creation returned the same follow-up. These are synthetic verification results, not real student improvement claims.
+- The integration used labeled mock feedback for these new jobs and targeted only its own sessions. The earlier live AIML feedback verification remains valid; new adaptation makes no AI-provider requests itself. Anonymous access and cross-origin mutations were rejected, and refresh preserved results/history.
+- Subject/language selection, sign-in continuation, question review and timeline rendering compile successfully. Browser interaction/visual QA and a real student's Neon sign-in remain unverified. Development content and translations need review before production use.
+- Topic/result/catalog queries now batch related records, and frontend polling waits for each response to avoid overlapping requests on a remote database.

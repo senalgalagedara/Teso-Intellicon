@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import select
-from app.assessment import db, service
+from app.assessment import db, service, learning
 from app.assessment.auth import authenticate, Identity
 from app.assessment.storage import Storage, MediaError
 from app.assessment import api_schemas as schemas
@@ -51,3 +51,15 @@ def image(sid: str, mid: str, identity: Identity = Depends(authenticate)):
     try: raw = Storage().read(m)
     except MediaError: raise HTTPException(503, 'Approved image currently unavailable') from None
     return Response(raw, media_type=m['mime_type'], headers={'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff'})
+
+@router.get('/history', response_model=schemas.History)
+def history(identity: Identity = Depends(authenticate)):
+    with db.engine.connect() as conn: return learning.history(conn, identity)
+
+@router.get('/sessions/{sid}/recommendation', response_model=schemas.Plan)
+def recommendation(sid: str, identity: Identity = Depends(authenticate)):
+    with db.engine.connect() as conn: return learning.recommend(conn, sid, identity)
+
+@router.post('/sessions/{sid}/next', response_model=schemas.Started)
+def next_paper(sid: str, request: schemas.NextRequest, identity: Identity = Depends(authenticate)):
+    return learning.start_next(db.engine, sid, identity, request.question_count)

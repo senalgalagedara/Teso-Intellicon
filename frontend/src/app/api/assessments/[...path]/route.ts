@@ -3,8 +3,8 @@ import { NextRequest } from "next/server";
 import { assessmentIdentity, sameOrigin, sign } from "@/lib/assessment-identity";
 import { fastapiBaseUrl } from "@/lib/fastapi-url";
 const allowed = (method: string, path: string) =>
-  (method === "GET" && /^(papers|sessions|sessions\/[a-f0-9-]+(\/(results|job)|\/media\/[a-zA-Z0-9_-]+)?)$/.test(path)) ||
-  (method === "POST" && /^(sessions|sessions\/[a-f0-9-]+\/submit)$/.test(path)) ||
+  (method === "GET" && /^(papers|history|sessions|sessions\/[a-f0-9-]+(\/(results|job|recommendation)|\/media\/[a-zA-Z0-9_-]+)?)$/.test(path)) ||
+  (method === "POST" && /^(sessions|sessions\/[a-f0-9-]+\/(submit|next))$/.test(path)) ||
   (method === "PUT" && /^sessions\/[a-f0-9-]+\/draft$/.test(path));
 async function proxy(req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) {
   const path = (await ctx.params).path.join("/");

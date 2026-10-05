@@ -1,0 +1,358 @@
+{
+  "subjects": [
+    {
+      "id": "physics-dev",
+      "name": "Physics (development)"
+    }
+  ],
+  "units": [
+    {
+      "id": "mechanics-dev",
+      "subject_id": "physics-dev",
+      "name": "Mechanics"
+    },
+    {
+      "id": "waves-dev",
+      "subject_id": "physics-dev",
+      "name": "Waves"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "force-dev",
+      "unit_id": "mechanics-dev",
+      "name": "Newton's second law"
+    },
+    {
+      "id": "speed-dev",
+      "unit_id": "mechanics-dev",
+      "name": "Average speed"
+    },
+    {
+      "id": "wave-speed-dev",
+      "unit_id": "waves-dev",
+      "name": "Wave speed"
+    }
+  ],
+  "resources": [
+    {
+      "id": "force-theory-dev-v1-si",
+      "version": 1,
+      "concept_id": "force-dev",
+      "title": "F = ma",
+      "theory": "සම්ප්‍රයුක්ත බලය F = ma. ත්වරණය a = F/m. බලය N, ස්කන්ධය kg සහ ත්වරණය m/s² ඒකකවලින් මනිනු ලැබේ.",
+      "url": null
+    },
+    {
+      "id": "speed-theory-dev-v1-si",
+      "version": 1,
+      "concept_id": "speed-dev",
+      "title": "Average speed / දුර / தூரம்",
+      "theory": "සාමාන්‍ය වේගය = මුළු දුර / ගත වූ කාලය. ඒකකය m/s වේ. විස්ථාපනය වෙනුවට මුළු දුර භාවිත කරන්න.",
+      "url": null
+    },
+    {
+      "id": "wave-theory-dev-v1-si",
+      "version": 1,
+      "concept_id": "wave-speed-dev",
+      "title": "v = fλ",
+      "theory": "තරංග වේගය v = fλ. සංඛ්‍යාතය f, Hz වලින්ද තරංග ආයාමය λ, m වලින්ද මනින විට වේගය m/s වලින් ලැබේ.",
+      "url": null
+    }
+  ],
+  "media": [],
+  "questions": [
+    {
+      "id": "force-dev-transfer-si-1-v1",
+      "version": 1,
+      "text": "ස්කන්ධය 3 kg වන වස්තුවක් මත 12 N සම්ප්‍රයුක්ත බලයක් ක්‍රියා කරයි. එහි ත්වරණය කීයද?",
+      "options": [
+        {
+          "id": "a",
+          "text": "4 m/s²"
+        },
+        {
+          "id": "b",
+          "text": "36 m/s²"
+        },
+        {
+          "id": "c",
+          "text": "0.25 m/s²"
+        }
+      ],
+      "correct_option_id": "a",
+      "marks": 2,
+      "concept_id": "force-dev",
+      "resource_ids": [
+        "force-theory-dev-v1-si"
+      ],
+      "base_explanation": "න්‍යාය භාවිතයෙන්: a = F/m = 12 / 3 = 4 m/s².",
+      "numeric_result": {
+        "value": 4.0,
+        "unit": "m/s²"
+      }
+    },
+    {
+      "id": "force-dev-transfer-si-2-v1",
+      "version": 1,
+      "text": "ස්කන්ධය 5 kg වන වස්තුවක් මත 20 N සම්ප්‍රයුක්ත බලයක් ක්‍රියා කරයි. එහි ත්වරණය කීයද?",
+      "options": [
+        {
+          "id": "a",
+          "text": "100 m/s²"
+        },
+        {
+          "id": "b",
+          "text": "0.25 m/s²"
+        },
+        {
+          "id": "c",
+          "text": "4 m/s²"
+        }
+      ],
+      "correct_option_id": "c",
+      "marks": 2,
+      "concept_id": "force-dev",
+      "resource_ids": [
+        "force-theory-dev-v1-si"
+      ],
+      "base_explanation": "න්‍යාය භාවිතයෙන්: a = F/m = 20 / 5 = 4 m/s².",
+      "numeric_result": {
+        "value": 4.0,
+        "unit": "m/s²"
+      }
+    },
+    {
+      "id": "force-dev-transfer-si-3-v1",
+      "version": 1,
+      "text": "ස්කන්ධය 2 kg වන වස්තුවක් මත 18 N සම්ප්‍රයුක්ත බලයක් ක්‍රියා කරයි. එහි ත්වරණය කීයද?",
+      "options": [
+        {
+          "id": "a",
+          "text": "0.1111 m/s²"
+        },
+        {
+          "id": "b",
+          "text": "9 m/s²"
+        },
+        {
+          "id": "c",
+          "text": "36 m/s²"
+        }
+      ],
+      "correct_option_id": "b",
+      "marks": 2,
+      "concept_id": "force-dev",
+      "resource_ids": [
+        "force-theory-dev-v1-si"
+      ],
+      "base_explanation": "න්‍යාය භාවිතයෙන්: a = F/m = 18 / 2 = 9 m/s².",
+      "numeric_result": {
+        "value": 9.0,
+        "unit": "m/s²"
+      }
+    },
+    {
+      "id": "speed-dev-transfer-si-1-v1",
+      "version": 1,
+      "text": "ශිෂ්‍යයෙක් 6 s කාලයක් තුළ 36 m මුළු දුරක් ගමන් කරයි. සාමාන්‍ය වේගය කීයද?",
+      "options": [
+        {
+          "id": "a",
+          "text": "6 m/s"
+        },
+        {
+          "id": "b",
+          "text": "216 m/s"
+        },
+        {
+          "id": "c",
+          "text": "0.1667 m/s"
+        }
+      ],
+      "correct_option_id": "a",
+      "marks": 1,
+      "concept_id": "speed-dev",
+      "resource_ids": [
+        "speed-theory-dev-v1-si"
+      ],
+      "base_explanation": "න්‍යාය භාවිතයෙන්: v = distance/time = 36 / 6 = 6 m/s.",
+      "numeric_result": {
+        "value": 6.0,
+        "unit": "m/s"
+      }
+    },
+    {
+      "id": "speed-dev-transfer-si-2-v1",
+      "version": 1,
+      "text": "ශිෂ්‍යයෙක් 7 s කාලයක් තුළ 42 m මුළු දුරක් ගමන් කරයි. සාමාන්‍ය වේගය කීයද?",
+      "options": [
+        {
+          "id": "a",
+          "text": "294 m/s"
+        },
+        {
+          "id": "b",
+          "text": "0.1667 m/s"
+        },
+        {
+          "id": "c",
+          "text": "6 m/s"
+        }
+      ],
+      "correct_option_id": "c",
+      "marks": 1,
+      "concept_id": "speed-dev",
+      "resource_ids": [
+        "speed-theory-dev-v1-si"
+      ],
+      "base_explanation": "න්‍යාය භාවිතයෙන්: v = distance/time = 42 / 7 = 6 m/s.",
+      "numeric_result": {
+        "value": 6.0,
+        "unit": "m/s"
+      }
+    },
+    {
+      "id": "speed-dev-transfer-si-3-v1",
+      "version": 1,
+      "text": "ශිෂ්‍යයෙක් 12 s කාලයක් තුළ 60 m මුළු දුරක් ගමන් කරයි. සාමාන්‍ය වේගය කීයද?",
+      "options": [
+        {
+          "id": "a",
+          "text": "0.2 m/s"
+        },
+        {
+          "id": "b",
+          "text": "5 m/s"
+        },
+        {
+          "id": "c",
+          "text": "720 m/s"
+        }
+      ],
+      "correct_option_id": "b",
+      "marks": 1,
+      "concept_id": "speed-dev",
+      "resource_ids": [
+        "speed-theory-dev-v1-si"
+      ],
+      "base_explanation": "න්‍යාය භාවිතයෙන්: v = distance/time = 60 / 12 = 5 m/s.",
+      "numeric_result": {
+        "value": 5.0,
+        "unit": "m/s"
+      }
+    },
+    {
+      "id": "wave-speed-dev-transfer-si-1-v1",
+      "version": 1,
+      "text": "තරංගයක සංඛ්‍යාතය 4 Hz සහ තරංග ආයාමය 3 m වේ. එහි වේගය කීයද?",
+      "options": [
+        {
+          "id": "a",
+          "text": "12 m/s"
+        },
+        {
+          "id": "b",
+          "text": "1.333 m/s"
+        },
+        {
+          "id": "c",
+          "text": "0.75 m/s"
+        }
+      ],
+      "correct_option_id": "a",
+      "marks": 2,
+      "concept_id": "wave-speed-dev",
+      "resource_ids": [
+        "wave-theory-dev-v1-si"
+      ],
+      "base_explanation": "න්‍යාය භාවිතයෙන්: v = fλ = 4 × 3 = 12 m/s.",
+      "numeric_result": {
+        "value": 12,
+        "unit": "m/s"
+      }
+    },
+    {
+      "id": "wave-speed-dev-transfer-si-2-v1",
+      "version": 1,
+      "text": "තරංගයක සංඛ්‍යාතය 8 Hz සහ තරංග ආයාමය 0.5 m වේ. එහි වේගය කීයද?",
+      "options": [
+        {
+          "id": "a",
+          "text": "16 m/s"
+        },
+        {
+          "id": "b",
+          "text": "0.0625 m/s"
+        },
+        {
+          "id": "c",
+          "text": "4 m/s"
+        }
+      ],
+      "correct_option_id": "c",
+      "marks": 2,
+      "concept_id": "wave-speed-dev",
+      "resource_ids": [
+        "wave-theory-dev-v1-si"
+      ],
+      "base_explanation": "න්‍යාය භාවිතයෙන්: v = fλ = 8 × 0.5 = 4 m/s.",
+      "numeric_result": {
+        "value": 4.0,
+        "unit": "m/s"
+      }
+    },
+    {
+      "id": "wave-speed-dev-transfer-si-3-v1",
+      "version": 1,
+      "text": "තරංගයක සංඛ්‍යාතය 6 Hz සහ තරංග ආයාමය 2 m වේ. එහි වේගය කීයද?",
+      "options": [
+        {
+          "id": "a",
+          "text": "0.3333 m/s"
+        },
+        {
+          "id": "b",
+          "text": "12 m/s"
+        },
+        {
+          "id": "c",
+          "text": "3 m/s"
+        }
+      ],
+      "correct_option_id": "b",
+      "marks": 2,
+      "concept_id": "wave-speed-dev",
+      "resource_ids": [
+        "wave-theory-dev-v1-si"
+      ],
+      "base_explanation": "න්‍යාය භාවිතයෙන්: v = fλ = 6 × 2 = 12 m/s.",
+      "numeric_result": {
+        "value": 12,
+        "unit": "m/s"
+      }
+    }
+  ],
+  "paper": {
+    "id": "physics-transfer-si-development-v1",
+    "version": 1,
+    "title": "Physics - SI development practice bank",
+    "status": "published",
+    "review_status": "development_fixture",
+    "is_development": true,
+    "question_ids": [
+      "force-dev-transfer-si-1-v1",
+      "force-dev-transfer-si-2-v1",
+      "force-dev-transfer-si-3-v1",
+      "speed-dev-transfer-si-1-v1",
+      "speed-dev-transfer-si-2-v1",
+      "speed-dev-transfer-si-3-v1",
+      "wave-speed-dev-transfer-si-1-v1",
+      "wave-speed-dev-transfer-si-2-v1",
+      "wave-speed-dev-transfer-si-3-v1"
+    ],
+    "marking_rule": "single_answer_no_penalty",
+    "subject_id": "physics-dev",
+    "content_language": "si"
+  }
+}

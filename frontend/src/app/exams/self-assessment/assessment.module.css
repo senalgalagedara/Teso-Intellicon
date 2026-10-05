@@ -33,3 +33,7 @@
 .media img { max-width: 100%; max-height: 420px; object-fit: contain; margin: 12px 0; background: white; border-radius: 6px; }
 .srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 @media (max-width: 600px) { .header, .row { flex-direction: column; align-items: flex-start; } .main { padding: 20px 16px 60px; } .card { padding: 20px; } }
+
+.tableWrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th, .table td { text-align: left; padding: 12px; border-bottom: 1px solid #39465d; vertical-align: top; }

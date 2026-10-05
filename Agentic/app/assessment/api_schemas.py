@@ -1,12 +1,12 @@
 from typing import Literal
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from app.assessment.content import Strict, Question, Resource, Option
 from app.assessment.provider import Feedback
 
 State = Literal['queued', 'processing', 'completed', 'partial', 'failed']
 class Started(Strict):
     session_id: str
-    status: Literal['in_progress']
+    status: Literal['in_progress', 'submitted']
 class DraftSaved(Strict):
     session_id: str
     status: Literal['draft_saved']
@@ -16,6 +16,9 @@ class PaperSummary(Strict):
     version: int
     is_development: bool
     question_count: int
+    subject_id: str
+    subject_name: str
+    content_language: str
 class PaperList(Strict):
     papers: list[PaperSummary]
 class SessionSummary(Strict):
@@ -37,6 +40,7 @@ class Exam(Strict):
     status: Literal['in_progress', 'submitted']
     language: str
     questions: list[ExamQuestion]
+    plan: dict | None
     drafts: dict[str, str | None]
     is_development: bool
 class Counts(Strict):
@@ -111,3 +115,24 @@ class Results(Submission):
     revision_concept_ids: list[str]
     questions: list[Review]
     interpretation: str
+
+class NextRequest(Strict):
+    question_count: int = Field(default=10, ge=1, le=50)
+class History(Strict):
+    attempts: list[dict]
+    concepts: list[dict]
+    completed_count: int
+    interpretation: str
+class Plan(Strict):
+    strategy: str
+    source_session_id: str
+    paper_id: str
+    language: str
+    question_ids: list[str]
+    question_count: int
+    requested_count: int
+    repeated_question_ids: list[str]
+    target_concept_ids: list[str]
+    selections: list[dict]
+    warnings: list[str]
+    explanation: str

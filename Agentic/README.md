@@ -14,6 +14,9 @@ python -m venv .venv
 # For a fresh setup: copy .env.example to .env and fill server configuration.
 .\.venv\Scripts\python.exe -m app.assessment.cli migrate
 .\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-development.json
+.\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-transfer-en-development.json
+.\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-transfer-si-development.json
+.\.venv\Scripts\python.exe -m app.assessment.cli import-content fixtures/physics-transfer-ta-development.json
 .\.venv\Scripts\python.exe -m app.server
 ```
 
