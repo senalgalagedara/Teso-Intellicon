@@ -1,0 +1,51 @@
+.dashboard { display: grid; gap: 30px; padding-bottom: 24px; }
+.pageHead, .sectionHead { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.eyebrow { color: #a8a6c7; font-size: 10px; letter-spacing: .16em; font-weight: 700; margin-bottom: 8px; }
+.pageHead h1 { font-size: clamp(24px, 3vw, 32px); letter-spacing: -.035em; font-weight: 650; }
+.pageHead p:not(.eyebrow) { color: #9ca8bc; margin-top: 5px; font-size: 14px; }
+.courseLink { display: flex; gap: 10px; align-items: center; border: 1px solid #2a3046; padding: 11px 14px; border-radius: 12px; color: #d9ddeb; text-decoration: none; font-size: 13px; }
+.courseLink span, .columnTitle span { border-radius: 6px; background: #272b43; padding: 2px 7px; font-size: 11px; color: #cfcbef; }
+.hero { display: grid; grid-template-columns: 1.15fr 1fr; min-height: 375px; overflow: hidden; border-radius: 22px; border: 1px solid #363050; background: linear-gradient(115deg, #252039, #181e34); }
+.heroCopy { padding: clamp(26px, 4vw, 45px); }
+.heroBadge { display: inline-flex; align-items: center; gap: 7px; color: #d3c6f3; font-size: 11px; letter-spacing: .025em; }
+.hero h2 { margin: 18px 0 14px; font-size: clamp(30px, 3.5vw, 44px); line-height: 1.14; letter-spacing: -.04em; font-weight: 650; color: #f7f2ff; }
+.heroCopy > p { color: #c0bad2; max-width: 42ch; font-size: 14px; line-height: 1.75; }
+.heroActions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 25px; }
+.primary, .secondary { text-decoration: none; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 9px; padding: 12px 15px; }
+.primary { color: #211b32; background: #d5bdf7; }
+.primary:hover { background: #e2cdfb; }
+.secondary { color: #e0d5f1; border: 1px solid #544961; }
+.secondary:hover { background: #ffffff0a; }
+.languageNote { display: flex; gap: 8px; align-items: center; color: #a8a1bb; margin-top: 19px; font-size: 11px; }
+.heroArt { position: relative; min-height: 300px; background: #131729; }
+.heroArt img { object-fit: cover; object-position: 60% center; }
+.artCaption { position: absolute; bottom: 20px; left: 20px; right: 20px; display: flex; align-items: center; gap: 8px; width: fit-content; max-width: calc(100% - 40px); font-size: 11px; color: #ece4fa; background: #161425d9; border: 1px solid #b49acd40; padding: 10px 12px; border-radius: 9px; backdrop-filter: blur(12px); }
+.routine { padding: 25px; background: #111725; border: 1px solid #242c3e; border-radius: 17px; }
+.routine h2, .sectionHead h2 { font-size: 21px; letter-spacing: -.025em; font-weight: 600; }
+.steps { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 25px; }
+.steps li { display: flex; gap: 12px; }
+.stepIcon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; height: 43px; width: 43px; border-radius: 12px; color: #c6b2ea; background: #28233b; }
+.steps li:nth-child(2) .stepIcon { color: #8cdbcd; background: #173332; }
+.steps li:nth-child(3) .stepIcon { color: #e4bd86; background: #332b22; }
+.steps h3 { font-size: 12px; font-weight: 600; margin: 2px 0 6px; color: #e4e5ee; }
+.steps p { font-size: 11px; line-height: 1.75; color: #97a1b5; }
+.sectionHead { scroll-margin-top: 24px; margin-top: 5px; }
+.courseCount { font-size: 12px; color: #a2aec2; }
+.courseGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.columnTitle { display: flex; align-items: center; gap: 9px; font-weight: 550; font-size: 14px; margin-bottom: 17px; color: #d6dbea; }
+.columnTitle > svg { color: #a8a2c3; }
+.columnTitle span { margin-left: auto; }
+.empty { display: grid; justify-items: start; gap: 10px; border: 1px dashed #32374b; background: #111625; padding: 26px; border-radius: 14px; height: 100%; min-height: 175px; align-content: center; }
+.empty > svg { color: #8c83ab; }
+.empty h4 { font-size: 13px; font-weight: 550; color: #dfe0ed; }
+.empty p { font-size: 12px; line-height: 1.7; color: #95a0b6; max-width: 52ch; }
+.courseSection { display: flex; flex-direction: column; min-width: 0; }
+.courseCard { overflow-wrap: anywhere; }
+.courseCard h3 { font-size: 16px; }
+.courseCard > p { color: #bac2d1; font-size: 13px; }
+.courseCard button { font-size: 12px; }
+.declined { color: #98a5bb; font-size: 13px; }
+.declined summary { cursor: pointer; margin-bottom: 16px; }
+.dashboard a:focus-visible, .dashboard button:focus-visible, .dashboard summary:focus-visible { outline: 2px solid #d5bdf7; outline-offset: 4px; }
+@media (max-width: 900px) { .hero { grid-template-columns: 1.1fr .9fr; } .steps { gap: 17px; } .steps li { flex-direction: column; } }
+@media (max-width: 700px) { .dashboard { gap: 24px; } .hero { grid-template-columns: 1fr; } .heroArt { min-height: 255px; } .heroCopy { padding: 27px; } .steps { grid-template-columns: 1fr; gap: 20px; } .steps li { flex-direction: row; } .courseGrid { grid-template-columns: 1fr; } .courseLink { font-size: 12px; } .heroActions { gap: 10px; } .routine { padding: 22px; } }

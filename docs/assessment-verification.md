@@ -69,3 +69,12 @@ was performed.
 - The catalog contains three languages, three subject-language versions, three topics, 30 question versions/families, 90 answer choices and nine theory sections. One configured private-bucket registry row was added. There are no imported image objects or image links in this database yet; image and vision paths remain verified with mocks.
 - An opt-in offline JSONL exporter separates prediction features from labels and metadata. Features use outcomes available before the target session started; earlier presentations include unfinished sessions. Development examples, known assistance and repeated question families are excluded by default. No real student dataset was exported and no predictive model was trained.
 - Browser interaction/visual checks and a real student's Neon sign-in remain unverified. Existing development content and translations still require team review before production use.
+
+## Illustrated student dashboard and issue audit
+
+- Audited all 30 GitHub issues (29 open, one closed) using authenticated read-only REST. No issue, label or comment was changed. The complete implementation mapping and remaining priorities are in `github-issue-audit.md`.
+- `/student` now contains a generated study illustration, assessment/history entry points, saved result metrics, latest topic revision priorities, recent-paper links and the existing course/invitation actions. Student `/dashboard` visits redirect to this learning space.
+- Frontend ESLint and production build pass. Fourteen focused checks rendered the actual progress component with controlled history fixtures: mixed development data, separate paper languages, later-correct topic evidence, practice/repetition labels, owned result links and loading/error/empty states. No browser or real-account interaction is implied by these checks.
+- Nine focused checks exercised the compiled identity bridge with a controlled auth DAL: signed-in students win over stale demo cookies, signed-in teacher roles are denied, valid anonymous local demos work, and invalid/expired/production/disabled demos are rejected.
+- The earlier 124 Python tests remain the backend verification baseline; this follow-up did not change Python or database schemas. No real student data, profile upload or new model training was added.
+- The generated illustration was inspected, but browser automation inventory was empty and opening the in-app browser reported unavailable. Actual desktop/mobile layout and real Neon sign-in remain pending.

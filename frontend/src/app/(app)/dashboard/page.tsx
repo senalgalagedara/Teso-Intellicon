@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/guards";
-import { listEnrollmentsForStudent, listTeacherRequests } from "@/lib/db/queries";
+import { listTeacherRequests } from "@/lib/db/queries";
 import { listCoursesForTeacher } from "@/lib/db/queries";
 import { ROLE_LABELS } from "@/lib/auth/dal";
 
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const user = await requireUser();
+  if (user.role === "student") redirect("/student");
 
   return (
     <>
@@ -21,41 +23,9 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {user.role === "student" ? <StudentSummary userId={user.id} /> : null}
       {user.role === "teacher" ? <TeacherSummary userId={user.id} /> : null}
       {user.role === "teacher_pending" ? <PendingSummary userId={user.id} /> : null}
       {user.role === "admin" ? <AdminSummary /> : null}
-    </>
-  );
-}
-
-async function StudentSummary({ userId }: { userId: string }) {
-  const enrollments = await listEnrollmentsForStudent(userId);
-  const invited = enrollments.filter((row) => row.status === "invited");
-  const accepted = enrollments.filter((row) => row.status === "accepted");
-
-  return (
-    <>
-      <div className="stat-row">
-        <Stat label="Pending invitations" value={invited.length} />
-        <Stat label="Active courses" value={accepted.length} />
-      </div>
-
-      {invited.length > 0 ? (
-        <p className="notice notice-blue">
-          You have {invited.length} pending course invitation{invited.length === 1 ? "" : "s"}.{" "}
-          <Link href="/student">Review them</Link>.
-        </p>
-      ) : (
-        <p className="notice">
-          No invitations yet. Teachers invite students by email, so ask your teacher to add
-          your address.
-        </p>
-      )}
-
-      <Link href="/student" className="btn btn-primary">
-        Go to my courses
-      </Link>
     </>
   );
 }
