@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     SUPABASE_KEY: str = "your-supabase-key"
     SUPABASE_STORAGE_BUCKET: str = "app-storage"
     
-    # AI Providers (existing, separate from revision engine)
+    # AI Providers
     OPENAI_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
