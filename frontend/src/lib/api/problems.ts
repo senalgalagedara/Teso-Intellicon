@@ -72,6 +72,41 @@ export class ApiError extends Error {
   }
 }
 
+const NETWORK_FAILURE_PATTERN =
+  /failed to fetch|networkerror|load failed|fetch failed|network request failed/i;
+const TIMEOUT_PATTERN = /abort(ed)?|timed out|timeout|did not complete/i;
+
+function errorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string") return message;
+  }
+  return "";
+}
+
+/**
+ * Turn an unknown thrown value into copy a user can act on.
+ *
+ * `ApiError` messages come from the server and are already presentable. Raw
+ * network or timeout failures from `fetch` (and plain `{ message }` callbacks
+ * such as the auth client's `error`) usually surface browser internals like
+ * "Failed to fetch", which is replaced here with a helpful line.
+ */
+export function messageForError(error: unknown, fallback: string): string {
+  if (error instanceof ApiError) return error.message;
+
+  const message = errorMessage(error);
+  if (TIMEOUT_PATTERN.test(message)) {
+    return "The request timed out. Please try again.";
+  }
+  if (NETWORK_FAILURE_PATTERN.test(message)) {
+    return "Unable to connect to the server. Please check your connection and try again.";
+  }
+
+  return fallback;
+}
+
 /** Throw an ApiError if the response was not successful. */
 export async function throwForStatus(response: Response): Promise<void> {
   if (response.ok) return;
