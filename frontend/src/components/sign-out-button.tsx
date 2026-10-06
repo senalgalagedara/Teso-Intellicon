@@ -19,7 +19,7 @@ export function SignOutButton() {
   return (
     <button
       type="button"
-      className="btn btn-secondary"
+      className="btn btn-ghost btn-sm"
       onClick={handleSignOut}
       disabled={pending}
     >
