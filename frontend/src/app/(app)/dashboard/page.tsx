@@ -14,7 +14,8 @@ export default async function DashboardPage() {
     <>
       <div className="page-head">
         <div>
-          <h1 className="gradient-text">Welcome back, {user.name}</h1>
+          <p className="eyebrow">Overview</p>
+          <h1 style={{ marginTop: 8 }}>Welcome back, {user.name}</h1>
           <p className="page-subtitle">
             You are signed in as {ROLE_LABELS[user.role]} ({user.email}).
           </p>
@@ -37,7 +38,11 @@ async function StudentSummary({ userId }: { userId: string }) {
   return (
     <>
       <div className="stat-row">
-        <Stat label="Pending invitations" value={invited.length} />
+        <Stat
+          label="Pending invitations"
+          value={invited.length}
+          tone={invited.length > 0 ? "warning" : undefined}
+        />
         <Stat label="Active courses" value={accepted.length} />
       </div>
 
@@ -48,14 +53,19 @@ async function StudentSummary({ userId }: { userId: string }) {
         </p>
       ) : (
         <p className="notice">
-          No invitations yet. Teachers invite students by email, so ask your teacher to add
-          your address.
+          No invitations yet. Teachers invite students by email, so ask your teacher to add your
+          address.
         </p>
       )}
 
-      <Link href="/student" className="btn btn-primary">
-        Go to my courses
-      </Link>
+      <div className="inline-form">
+        <Link href="/student" className="btn btn-primary">
+          Go to my courses
+        </Link>
+        <Link href="/exams/self-assessment" className="btn btn-secondary">
+          Start a self-assessment
+        </Link>
+      </div>
     </>
   );
 }
@@ -70,7 +80,11 @@ async function TeacherSummary({ userId }: { userId: string }) {
       <div className="stat-row">
         <Stat label="Courses" value={courses.length} />
         <Stat label="Enrolled students" value={students} />
-        <Stat label="Awaiting response" value={pending} />
+        <Stat
+          label="Awaiting response"
+          value={pending}
+          tone={pending > 0 ? "warning" : undefined}
+        />
       </div>
 
       <Link href="/teacher" className="btn btn-primary">
@@ -99,7 +113,11 @@ async function AdminSummary() {
   return (
     <>
       <div className="stat-row">
-        <Stat label="Awaiting approval" value={pending.length} />
+        <Stat
+          label="Awaiting approval"
+          value={pending.length}
+          tone={pending.length > 0 ? "warning" : undefined}
+        />
         <Stat label="Reviewed requests" value={requests.length - pending.length} />
       </div>
 
@@ -110,10 +128,20 @@ async function AdminSummary() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone?: "warning" | "success";
+}) {
+  const valueClass = tone === "warning" ? " is-warning" : tone === "success" ? " is-success" : "";
+
   return (
-    <div className="stat glass-card">
-      <span className="stat-value">{value}</span>
+    <div className="stat card">
+      <span className={`stat-value${valueClass}`}>{value}</span>
       <span className="stat-label">{label}</span>
     </div>
   );

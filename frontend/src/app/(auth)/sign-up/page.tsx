@@ -6,7 +6,7 @@ export default function SignUpPage() {
   return (
     <>
       <div className="auth-header">
-        <h1 className="gradient-text">Create an account</h1>
+        <h1>Create an account</h1>
         <p className="auth-subtitle">
           Students get access immediately. Teacher accounts need an admin approval.
         </p>

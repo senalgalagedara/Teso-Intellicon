@@ -6,7 +6,7 @@ export default function SignInPage() {
   return (
     <>
       <div className="auth-header">
-        <h1 className="gradient-text">Sign in</h1>
+        <h1>Sign in</h1>
         <p className="auth-subtitle">Use the email and password for your account.</p>
       </div>
 
