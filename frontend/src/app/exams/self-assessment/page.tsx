@@ -2,15 +2,15 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import History from "./learning-history";
+import { ApiError, readProblem, messageForError } from "@/lib/api/problems";
 import type { Exam, Paper, Session, Result, Question, LearningHistory, Plan } from "@/lib/assessment-types";
 import styles from "./assessment.module.css";
 
 const languages: Record<string, string> = {en: "English", si: "සිංහල", ta: "தமிழ்"};
 async function api<T>(path: string, method = "GET", data?: unknown): Promise<T> {
   const response = await fetch(`/api/assessments/${path}`, { method, headers: { "Content-Type": "application/json" }, body: data === undefined ? undefined : JSON.stringify(data), cache: "no-store" });
-  const value = await response.json();
-  if (!response.ok) throw new Error(typeof value.detail === "string" ? value.detail : value.error || "Assessment request failed");
-  return value;
+  if (!response.ok) throw new ApiError(await readProblem(response));
+  return response.json();
 }
 function Media({ ids, sid }: { ids: string[]; sid: string }) {
   return <>{ids.map(id => <div key={id} className={styles.media}>
@@ -39,6 +39,7 @@ export default function SelfAssessment() {
   const [demoAvailable, setDemoAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showAuth, setShowAuth] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
   const openSession = useCallback(async (sid: string) => {
     const e = await api<Exam>(`sessions/${sid}`);
     setExam(e); setChoices(e.drafts); setResult(null); setPlan(null); setNotice("");
@@ -51,7 +52,7 @@ export default function SelfAssessment() {
   }, []);
   const load = useCallback(async () => {
     const [p, s, h] = await Promise.all([api<{ papers: Paper[] }>("papers"), api<{ sessions: Session[] }>("sessions"), api<LearningHistory>("history")]);
-    setPapers(p.papers); setSessions(s.sessions); setHistory(h); setShowAuth(false); setError("");
+    setPapers(p.papers); setSessions(s.sessions); setHistory(h); setShowAuth(false); setError(""); setLoadFailed(false);
   }, []);
   useEffect(() => {
     let active = true;
@@ -63,7 +64,12 @@ export default function SelfAssessment() {
         await load();
         const sid = new URLSearchParams(window.location.search).get("session");
         if (active && sid) await openSession(sid);
-      } catch (e) { if (active) { setShowAuth(true); setError((e as Error).message); } } finally { if (active) setLoading(false); }
+      } catch (e) {
+        if (!active) return;
+        if (e instanceof ApiError && e.status === 401) { setShowAuth(true); return; }
+        setLoadFailed(true);
+        setError(messageForError(e, "Couldn't reach the assessment service. Please try again."));
+      } finally { if (active) setLoading(false); }
     }
     void init(); return () => { active = false; };
   }, [load, openSession]);
@@ -73,7 +79,7 @@ export default function SelfAssessment() {
     let timer: ReturnType<typeof setTimeout>;
     async function poll() {
       try { const r = await api<Result>(`sessions/${result!.session_id}/results`); if (active) setResult(r); }
-      catch (e) { if (active) setError((e as Error).message); }
+      catch (e) { if (active) setError(messageForError(e, "Couldn't update your result. Your score is already saved and you can check again in a moment.")); }
       finally { if (active) timer = setTimeout(poll, 5000); }
     }
     timer = setTimeout(poll, 2500);
@@ -81,7 +87,11 @@ export default function SelfAssessment() {
   }, [result]);
   async function run(action: () => Promise<void>) {
     setBusy(true); setError("");
-    try { await action(); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+    try { await action(); }
+    catch (e) {
+      if (e instanceof ApiError && e.status === 401) { setShowAuth(true); return; }
+      setError(messageForError(e, "That didn't work. Please try again."));
+    } finally { setBusy(false); }
   }
   function answerBody() { return { answers: exam?.questions.map(q => ({ question_id: q.id, selected_option: choices[q.id] ?? null })) || [] }; }
   return <main className={styles.main}>
@@ -97,6 +107,7 @@ export default function SelfAssessment() {
     </section>}
     {loading && <p role="status">Loading your student session...</p>}
     {!exam && !showAuth && !loading && <>
+      {loadFailed && <section className={styles.card}><h2>Assessment service temporarily unreachable</h2><p className={styles.muted}>Your results and saved drafts are held on the server, so nothing is lost. Check your connection and try again.</p><div className={styles.actions}><button disabled={busy} onClick={() => void run(load)}>Try again</button></div></section>}
       <section className={styles.card}><h2>Choose your paper</h2>
         <label>1. Subject<select value={subject} onChange={e => {setSubject(e.target.value); const l = papers.find(p => p.subject_id === e.target.value)?.content_language || "en"; setPaperLanguage(l); setLanguage(l);}}><option value="">Choose a subject</option>{Array.from(new Map(papers.map(p => [p.subject_id, p.subject_name]))).map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select></label>
         {subject && <label>2. Paper language<select value={paperLanguage} onChange={e => {setPaperLanguage(e.target.value); setLanguage(e.target.value);}}>{Array.from(new Set(papers.filter(p => p.subject_id === subject).map(p => p.content_language))).map(l => <option key={l} value={l}>{languages[l]}</option>)}</select></label>}

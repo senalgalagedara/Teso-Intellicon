@@ -1,13 +1,20 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
+from app.errors import AccessLogMiddleware, install_exception_handlers
 from app.routers import health, ai, documents, assessments
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Python FastAPI backend providing AI endpoints and Supabase integration for Next.js frontend."
+    description="Python FastAPI backend providing AI endpoints and Supabase integration for Next.js frontend.",
 )
+
+# Uniform RFC 9457 problem responses: no internal details ever leak to clients.
+install_exception_handlers(app)
+
+# Outermost: attaches X-Request-ID and logs every request.
+app.add_middleware(AccessLogMiddleware)
 
 # Enable CORS for Next.js frontend
 app.add_middleware(
