@@ -2,15 +2,15 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import History from "./learning-history";
+import { ApiError, readProblem } from "@/lib/api/problems";
 import type { Exam, Paper, Session, Result, Question, LearningHistory, Plan } from "@/lib/assessment-types";
 import styles from "./assessment.module.css";
 
 const languages: Record<string, string> = {en: "English", si: "සිංහල", ta: "தமிழ்"};
 async function api<T>(path: string, method = "GET", data?: unknown): Promise<T> {
   const response = await fetch(`/api/assessments/${path}`, { method, headers: { "Content-Type": "application/json" }, body: data === undefined ? undefined : JSON.stringify(data), cache: "no-store" });
-  const value = await response.json();
-  if (!response.ok) throw new Error(typeof value.detail === "string" ? value.detail : value.error || "Assessment request failed");
-  return value;
+  if (!response.ok) throw new ApiError(await readProblem(response));
+  return response.json();
 }
 function Media({ ids, sid }: { ids: string[]; sid: string }) {
   return <>{ids.map(id => <div key={id} className={styles.media}>
