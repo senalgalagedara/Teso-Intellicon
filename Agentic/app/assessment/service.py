@@ -37,15 +37,17 @@ def question_rows(conn, session_id):
     return list(conn.execute(select(db.questions.c.content).join(db.presented, db.presented.c.question_id == db.questions.c.id).where(db.presented.c.session_id == session_id).order_by(db.presented.c.position)).scalars())
 
 def paper_list(conn, identity):
-    papers = [p for p in conn.execute(select(db.papers.c.content)).scalars() if not p['is_development'] or (settings.ALLOW_DEVELOPMENT_CONTENT and identity.is_development)]
+    allow_dev = settings.ALLOW_DEVELOPMENT_CONTENT and (identity.is_development or settings.ENVIRONMENT == 'development')
+    papers = [p for p in conn.execute(select(db.papers.c.content)).scalars() if not p['is_development'] or allow_dev]
     subjects = {r['question_id']: r for r in conn.execute(select(db.questions.c.id.label('question_id'), db.subjects.c.id.label('subject_id'), db.subjects.c.name).select_from(db.questions).join(db.concepts).join(db.units).join(db.subjects).where(db.questions.c.id.in_([p['question_ids'][0] for p in papers]))).mappings()}
     return [dict(id=p['id'], title=p['title'], version=p['version'], is_development=p['is_development'], question_count=len(p['question_ids']), subject_id=subjects[p['question_ids'][0]]['subject_id'], subject_name=subjects[p['question_ids'][0]]['name'], content_language=p.get('content_language', 'en')) for p in papers]
 
 def start(engine, identity, request, *, plan=None):
     with db.begin(engine) as conn:
         try:
+            allow_dev = settings.ALLOW_DEVELOPMENT_CONTENT and (identity.is_development or settings.ENVIRONMENT == 'development')
             p = conn.execute(select(db.papers.c.content).where(db.papers.c.id == request.paper_id)).scalar_one_or_none()
-            if not p or (p['is_development'] and not (settings.ALLOW_DEVELOPMENT_CONTENT and identity.is_development)):
+            if not p or (p['is_development'] and not allow_dev):
                 raise HTTPException(404, 'Published paper not found')
             if plan:
                 owned(conn, plan['source_session_id'], identity, lock=True)
@@ -201,3 +203,54 @@ def allowed_media(conn, sid, mid, identity):
         if s['status'] == 'submitted': allowed.update(q['solution_media_ids'])
     if mid not in allowed: raise HTTPException(404, 'Media not available in this assessment')
     return conn.execute(select(db.media.c.content).where(db.media.c.id == mid)).scalar_one()
+
+def check_single_answer(engine, sid, identity, question_id: str, selected_option: str, active_duration_ms: int | None = None):
+    with db.begin(engine) as conn:
+        try:
+            s = owned(conn, sid, identity, lock=True)
+            if s['status'] == 'submitted':
+                raise HTTPException(409, 'Assessment already submitted')
+            qs = {q['id']: q for q in question_rows(conn, sid)}
+            if question_id not in qs:
+                raise HTTPException(404, 'Question does not belong to this assessment')
+            q = qs[question_id]
+            valid_options = {o['id'] for o in q['options']}
+            if selected_option not in valid_options:
+                raise HTTPException(422, 'Selected option does not belong to this question')
+            
+            is_correct = (selected_option == q['correct_option_id'])
+            now = time.time()
+            
+            previous = conn.execute(select(db.answers).where(db.answers.c.session_id == sid, db.answers.c.question_id == question_id)).mappings().first()
+            values = dict(
+                selected_option=selected_option,
+                answered_at=now,
+                duration_ms=active_duration_ms,
+                correct=is_correct,
+                marks=q['marks'] if is_correct else 0,
+                is_final=False
+            )
+            if previous:
+                conn.execute(db.answers.update().where(db.answers.c.session_id == sid, db.answers.c.question_id == question_id).values(**values))
+            else:
+                conn.execute(db.answers.insert().values(session_id=sid, question_id=question_id, **values))
+            
+            resource_ids = q.get('resource_ids', [])
+            res_rows = []
+            if resource_ids:
+                res_rows = list(conn.execute(select(db.resources.c.content).where(db.resources.c.id.in_(resource_ids))).scalars())
+            
+            conn.commit()
+            return {
+                'question_id': question_id,
+                'selected_option': selected_option,
+                'correct_option_id': q['correct_option_id'],
+                'is_correct': is_correct,
+                'marks': q['marks'] if is_correct else 0,
+                'total_marks': q['marks'],
+                'base_explanation': q.get('base_explanation') or '',
+                'resources': res_rows
+            }
+        except BaseException:
+            conn.rollback()
+            raise

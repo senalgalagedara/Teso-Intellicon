@@ -136,3 +136,18 @@ class Plan(Strict):
     selections: list[dict]
     warnings: list[str]
     explanation: str
+
+class CheckAnswerRequest(Strict):
+    question_id: str
+    selected_option: str
+    active_duration_ms: int | None = Field(default=None, ge=0, le=86_400_000)
+
+class CheckAnswerResponse(Strict):
+    question_id: str
+    selected_option: str
+    correct_option_id: str
+    is_correct: bool
+    marks: float
+    total_marks: float
+    base_explanation: str
+    resources: list[Resource] = []
