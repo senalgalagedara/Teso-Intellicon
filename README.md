@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Teso Intellicon
 
 A modern full-stack educational platform for Sri Lankan G.C.E. A/L students and tuition teachers. It combines a **Next.js 15 App Router** frontend with server-side Role-Based Access Control (RBAC), **Neon Serverless Postgres** with **Neon Auth (Managed Better Auth)**, and a **Python FastAPI** backend that hosts both the AI/document services and the **TESO Revision Engine**: an adaptive MCQ practice, spaced-repetition, and cohort-analytics system.
