@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { listEnrollmentsForStudent, listTeacherRequests } from "@/lib/db/queries";
 import { listCoursesForTeacher } from "@/lib/db/queries";
 import { ROLE_LABELS } from "@/lib/auth/dal";
+import SelfAssessmentDashboard from "@/components/self-assessment-dashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {user.role === "student" ? <StudentSummary userId={user.id} /> : null}
+      {user.role === "student" ? <StudentSummary user={user} /> : null}
       {user.role === "teacher" ? <TeacherSummary userId={user.id} /> : null}
       {user.role === "teacher_pending" ? <PendingSummary userId={user.id} /> : null}
       {user.role === "admin" ? <AdminSummary /> : null}
@@ -30,8 +31,12 @@ export default async function DashboardPage() {
   );
 }
 
-async function StudentSummary({ userId }: { userId: string }) {
-  const enrollments = await listEnrollmentsForStudent(userId);
+async function StudentSummary({
+  user,
+}: {
+  user: { id: string; name: string; email: string };
+}) {
+  const enrollments = await listEnrollmentsForStudent(user.id);
   const invited = enrollments.filter((row) => row.status === "invited");
   const accepted = enrollments.filter((row) => row.status === "accepted");
 
@@ -58,14 +63,18 @@ async function StudentSummary({ userId }: { userId: string }) {
         </p>
       )}
 
-      <div className="inline-form">
+      <div className="inline-form" style={{ marginBottom: "2rem" }}>
         <Link href="/student" className="btn btn-primary">
           Go to my courses
         </Link>
-        <Link href="/exams/self-assessment" className="btn btn-secondary">
-          Start a self-assessment
-        </Link>
       </div>
+
+      <SelfAssessmentDashboard
+        showTopNav={false}
+        embedded={true}
+        initialUserName={user.name}
+        initialUserEmail={user.email}
+      />
     </>
   );
 }

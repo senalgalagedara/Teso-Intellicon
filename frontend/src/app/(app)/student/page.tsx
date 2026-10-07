@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { respondToInviteAction } from "@/app/actions/student";
 import { ActionForm } from "@/components/action-form";
 import { requireRole } from "@/lib/auth/guards";
 import { listEnrollmentsForStudent } from "@/lib/db/queries";
+import SelfAssessmentDashboard from "@/components/self-assessment-dashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -25,21 +25,6 @@ export default async function StudentCoursesPage() {
           </p>
         </div>
       </div>
-
-      <section className="callout callout-ai">
-        <span className="callout-label">Adaptive practice</span>
-        <div className="row-between">
-          <div>
-            <h2 className="card-title">Your learning journey</h2>
-            <p className="muted" style={{ marginTop: 4, maxWidth: "56ch" }}>
-              Take a paper, revise missed theory, and compare your topic progress over time.
-            </p>
-          </div>
-          <Link href="/exams/self-assessment" className="btn btn-primary">
-            Self-assessment &amp; learning history
-          </Link>
-        </div>
-      </section>
 
       <section>
         <h2 className="section-title">Invitations ({invited.length})</h2>
@@ -128,6 +113,15 @@ export default async function StudentCoursesPage() {
           </ul>
         </section>
       ) : null}
+
+      <section style={{ marginTop: "2.5rem" }}>
+        <SelfAssessmentDashboard
+          showTopNav={false}
+          embedded={true}
+          initialUserName={user.name}
+          initialUserEmail={user.email}
+        />
+      </section>
     </>
   );
 }

@@ -3,6 +3,7 @@ import { requireRole } from "@/lib/auth/guards";
 import { listEnrollmentsForStudent } from "@/lib/db/queries";
 import { getNextQuestionAction } from "@/app/actions/practice";
 import { QuestionCard } from "@/components/question-card";
+import SelfAssessmentDashboard from "@/components/self-assessment-dashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -18,16 +19,24 @@ export default async function StudentPracticePage({
 
   if (activeCourses.length === 0) {
     return (
-      <div className="page-head">
-        <h1 className="gradient-text">Adaptive Practice</h1>
-        <p className="notice" style={{ marginTop: "1.5rem" }}>
-          You are not enrolled in any active courses yet. Please accept an invitation on your{" "}
-          <Link href="/student" style={{ color: "var(--accent-purple)", textDecoration: "underline" }}>
-            Courses dashboard
-          </Link>{" "}
-          to begin practicing.
-        </p>
-      </div>
+      <>
+        <div className="page-head" style={{ marginBottom: "1rem" }}>
+          <div>
+            <p className="eyebrow">Adaptive Practice</p>
+            <h1 className="gradient-text" style={{ marginTop: 8 }}>Practice &amp; Self-Assessment</h1>
+            <p className="page-subtitle">
+              You are not enrolled in any teacher courses yet. You can practice unlimited questions and track your high score below!
+            </p>
+          </div>
+        </div>
+
+        <SelfAssessmentDashboard
+          showTopNav={false}
+          embedded={true}
+          initialUserName={user.name}
+          initialUserEmail={user.email}
+        />
+      </>
     );
   }
 

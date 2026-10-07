@@ -53,6 +53,7 @@ function roleLinks(role: string): { href: string; label: string }[] {
   if (role === "student") {
     links.push({ href: "/student", label: "Courses" });
     links.push({ href: "/student/practice", label: "Practice" });
+    links.push({ href: "/exams/self-assessment", label: "Self-Assessment" });
     links.push({ href: "/student/review", label: "Reviews" });
     links.push({ href: "/student/progress", label: "Progress" });
   }
