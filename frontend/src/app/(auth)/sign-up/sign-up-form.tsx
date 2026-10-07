@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 
 import { finishSignUpAction, type ActionState } from "@/app/actions/auth";
 import { authClient } from "@/lib/auth/client";
+import { authErrorText } from "@/lib/auth/client-errors";
 import { SubmitButton } from "@/components/submit-button";
 
 const INITIAL_STATE: ActionState = {};
@@ -45,14 +46,24 @@ export function SignUpForm() {
       return;
     }
 
-    const { error } = await authClient.signUp.email({
-      name: String(form.get("name") ?? ""),
-      email: String(form.get("email") ?? ""),
-      password,
-    });
+    let error: unknown = null;
+    try {
+      ({ error } = await authClient.signUp.email({
+        name: String(form.get("name") ?? ""),
+        email: String(form.get("email") ?? ""),
+        password,
+      }));
+    } catch (e) {
+      error = e;
+    }
 
     if (error) {
-      setAccountError(error.message ?? "Could not create that account.");
+      setAccountError(
+        authErrorText(error, {
+          duplicate: "An account with this email already exists. Try signing in instead.",
+          fallback: "Could not create that account.",
+        }),
+      );
       setAccountPending(false);
       return;
     }

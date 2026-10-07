@@ -15,10 +15,13 @@ export default async function TeacherApprovalsPage() {
   return (
     <>
       <div className="page-head">
-        <h1 className="gradient-text">Teacher approvals</h1>
-        <p className="page-subtitle">
-          A teacher account can sign in but cannot create courses until it is approved here.
-        </p>
+        <div>
+          <p className="eyebrow">Admin</p>
+          <h1 style={{ marginTop: 8 }}>Teacher approvals</h1>
+          <p className="page-subtitle">
+            A teacher account can sign in but cannot create courses until it is approved here.
+          </p>
+        </div>
       </div>
 
       <section>
@@ -29,7 +32,7 @@ export default async function TeacherApprovalsPage() {
         ) : (
           <ul className="stack">
             {pending.map((request) => (
-              <li key={request.id} className="glass-card">
+              <li key={request.id} className="card">
                 <div className="row-between">
                   <div>
                     <h3 className="card-title">{request.requester_name ?? "Unnamed"}</h3>
@@ -47,7 +50,7 @@ export default async function TeacherApprovalsPage() {
                     type="submit"
                     name="decision"
                     value="approved"
-                    className="btn btn-storage"
+                    className="btn btn-success"
                   >
                     Approve
                   </button>

@@ -34,7 +34,8 @@ export default async function CourseRosterPage({
           <Link href="/teacher" className="back-link">
             &larr; All courses
           </Link>
-          <h1 className="gradient-text">{course.title}</h1>
+          <p className="eyebrow">Course</p>
+          <h1 style={{ marginTop: 6 }}>{course.title}</h1>
           <p className="page-subtitle">{course.description ?? "No description."}</p>
         </div>
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
@@ -48,9 +49,9 @@ export default async function CourseRosterPage({
         </div>
       </div>
 
-      <div className="glass-card">
+      <div className="card">
         <h2 className="card-title">Invite a student</h2>
-        <p className="muted">
+        <p className="muted" style={{ margin: "6px 0 14px" }}>
           The student must already have an account. They accept or decline from their own
           dashboard.
         </p>
@@ -88,8 +89,8 @@ export default async function CourseRosterPage({
               {roster.map((entry) => (
                 <tr key={entry.enrollment_id}>
                   <td>
-                    <span className="stack-sm">
-                      <span>{entry.student_name ?? "Unnamed"}</span>
+                    <span className="stack-sm" style={{ gap: 2 }}>
+                      <span style={{ fontWeight: 600 }}>{entry.student_name ?? "Unnamed"}</span>
                       <span className="muted">{entry.student_email}</span>
                     </span>
                   </td>
@@ -101,7 +102,7 @@ export default async function CourseRosterPage({
                     <ActionForm action={removeStudentAction} className="inline-form">
                       <input type="hidden" name="courseId" value={course.id} />
                       <input type="hidden" name="enrollmentId" value={entry.enrollment_id} />
-                      <button type="submit" className="btn btn-secondary">
+                      <button type="submit" className="btn btn-secondary btn-sm">
                         Remove
                       </button>
                     </ActionForm>
@@ -113,9 +114,11 @@ export default async function CourseRosterPage({
         )}
       </section>
 
-      <div className="glass-card danger-zone">
+      <div className="card danger-zone">
         <h2 className="card-title">Delete course</h2>
-        <p className="muted">Removes the course and every enrollment on it.</p>
+        <p className="muted" style={{ margin: "6px 0 14px" }}>
+          Removes the course and every enrollment on it.
+        </p>
         <ActionForm action={deleteCourseAction} className="inline-form">
           <input type="hidden" name="courseId" value={course.id} />
           <button type="submit" className="btn btn-danger">

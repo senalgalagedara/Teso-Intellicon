@@ -26,6 +26,12 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Uniform RFC 9457 problem responses: no internal details ever leak to clients.
+install_exception_handlers(app)
+
+# Outermost: attaches X-Request-ID and logs every request.
+app.add_middleware(AccessLogMiddleware)
+
 # Enable CORS for Next.js frontend
 app.add_middleware(
     CORSMiddleware,

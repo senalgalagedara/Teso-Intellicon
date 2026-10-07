@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getCurrentUser, ROLE_LABELS } from "@/lib/auth/dal";
 import { SignOutButton } from "@/components/sign-out-button";
+import { SidebarNav } from "@/components/sidebar-nav";
 
 export const dynamic = "force-dynamic";
 
@@ -17,44 +18,36 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="app-shell">
-      <div className="ambient-glow-1" />
-      <div className="ambient-glow-2" />
-
-      <header className="app-header">
+      <aside className="app-sidebar">
         <Link href="/dashboard" className="app-brand">
-          <span className="gradient-text">Teso Intellicon</span>
+          <span className="brand-mark" aria-hidden="true">
+            T
+          </span>
+          Teso
         </Link>
 
-        <nav className="app-nav">
-          <RoleNav role={user.role} />
+        <nav className="app-nav" aria-label="Main">
+          <span className="app-nav-label">Menu</span>
+          <SidebarNav links={roleLinks(user.role)} />
         </nav>
 
-        <div className="app-user">
+        <div className="sidebar-foot">
           <span className={`badge ${roleBadgeClass(user.role)}`}>{ROLE_LABELS[user.role]}</span>
-          <span className="app-user-name">{user.name}</span>
+          <span className="sidebar-user" title={user.email}>
+            {user.name}
+          </span>
           <SignOutButton />
         </div>
-      </header>
+      </aside>
 
-      <main className="container">{children}</main>
+      <div className="app-main">
+        <main className="container">{children}</main>
+      </div>
     </div>
   );
 }
 
-function roleBadgeClass(role: string): string {
-  switch (role) {
-    case "admin":
-      return "badge-red";
-    case "teacher":
-      return "badge-blue";
-    case "teacher_pending":
-      return "badge-yellow";
-    default:
-      return "badge-green";
-  }
-}
-
-function RoleNav({ role }: { role: string }) {
+function roleLinks(role: string): { href: string; label: string }[] {
   const links: { href: string; label: string }[] = [{ href: "/dashboard", label: "Overview" }];
 
   if (role === "student") {
@@ -77,13 +70,18 @@ function RoleNav({ role }: { role: string }) {
     links.push({ href: "/admin/teachers", label: "Teacher approvals" });
   }
 
-  return (
-    <>
-      {links.map((link) => (
-        <Link key={link.href} href={link.href} className="app-nav-link">
-          {link.label}
-        </Link>
-      ))}
-    </>
-  );
+  return links;
+}
+
+function roleBadgeClass(role: string): string {
+  switch (role) {
+    case "admin":
+      return "badge-red";
+    case "teacher":
+      return "badge-blue";
+    case "teacher_pending":
+      return "badge-yellow";
+    default:
+      return "badge-green";
+  }
 }

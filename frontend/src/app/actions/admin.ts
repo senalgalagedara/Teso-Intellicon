@@ -6,6 +6,7 @@ import { authorize } from "@/lib/auth/dal";
 import { reviewTeacherRequest } from "@/lib/db/queries";
 import type { ActionState } from "@/app/actions/auth";
 import type { TeacherRequestStatus } from "@/lib/auth/roles";
+import { actionError } from "@/app/actions/errors";
 
 const DECISIONS = ["approved", "rejected"] as const;
 
@@ -24,34 +25,38 @@ export async function reviewTeacherAction(
   _previous: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const auth = await authorize(["admin"]);
+  try {
+    const auth = await authorize(["admin"]);
 
-  if (!auth.ok) {
-    return { error: auth.error };
+    if (!auth.ok) {
+      return { error: auth.error };
+    }
+
+    const requestId = String(formData.get("requestId") ?? "");
+    const decision = formData.get("decision");
+
+    if (!isDecision(decision)) {
+      return { error: "Unknown decision." };
+    }
+
+    const decided = await reviewTeacherRequest(requestId, auth.user.id, decision);
+
+    revalidatePath("/admin/teachers");
+    revalidatePath("/dashboard");
+
+    if (!decided) {
+      return { error: "That request was already reviewed by someone else." };
+    }
+
+    const next: TeacherRequestStatus = decision;
+
+    return {
+      success:
+        next === "approved"
+          ? "Teacher approved. They can create courses now."
+          : "Request rejected. The account stays a student.",
+    };
+  } catch (error) {
+    return actionError("reviewTeacher", error);
   }
-
-  const requestId = String(formData.get("requestId") ?? "");
-  const decision = formData.get("decision");
-
-  if (!isDecision(decision)) {
-    return { error: "Unknown decision." };
-  }
-
-  const decided = await reviewTeacherRequest(requestId, auth.user.id, decision);
-
-  revalidatePath("/admin/teachers");
-  revalidatePath("/dashboard");
-
-  if (!decided) {
-    return { error: "That request was already reviewed by someone else." };
-  }
-
-  const next: TeacherRequestStatus = decision;
-
-  return {
-    success:
-      next === "approved"
-        ? "Teacher approved. They can create courses now."
-        : "Request rejected. The account stays a student.",
-  };
 }

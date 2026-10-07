@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { authClient } from "@/lib/auth/client";
+import { authErrorText } from "@/lib/auth/client-errors";
 
 export function SignInForm() {
   const router = useRouter();
@@ -17,20 +18,26 @@ export function SignInForm() {
 
     const form = new FormData(event.currentTarget);
 
-    const { error: signInError } = await authClient.signIn.email({
-      email: String(form.get("email") ?? ""),
-      password: String(form.get("password") ?? ""),
-    });
+    let signInError: unknown = null;
+    try {
+      ({ error: signInError } = await authClient.signIn.email({
+        email: String(form.get("email") ?? ""),
+        password: String(form.get("password") ?? ""),
+      }));
+    } catch (e) {
+      signInError = e;
+    }
 
     if (signInError) {
-      setError(signInError.message ?? "Could not sign in with those details.");
+      setError(authErrorText(signInError, { fallback: "Could not sign in with those details." }));
       setPending(false);
       return;
     }
 
     // replace() so the browser Back button does not return to a page that
     // expects a session. refresh() picks up the server-rendered role.
-    router.replace("/dashboard");
+    const next = new URLSearchParams(window.location.search).get("next");
+    router.replace(next === "/exams/self-assessment" ? next : "/dashboard");
     router.refresh();
   }
 

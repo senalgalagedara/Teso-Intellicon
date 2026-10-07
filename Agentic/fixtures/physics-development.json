@@ -1,0 +1,17 @@
+{
+  "subjects": [{"id": "physics-dev", "name": "Physics (development)"}],
+  "units": [{"id": "mechanics-dev", "subject_id": "physics-dev", "name": "Mechanics"}, {"id": "waves-dev", "subject_id": "physics-dev", "name": "Waves"}],
+  "concepts": [{"id": "force-dev", "unit_id": "mechanics-dev", "name": "Newton's second law"}, {"id": "speed-dev", "unit_id": "mechanics-dev", "name": "Average speed"}, {"id": "wave-speed-dev", "unit_id": "waves-dev", "name": "Wave speed"}],
+  "resources": [
+    {"id": "force-theory-dev-v1", "version": 1, "concept_id": "force-dev", "title": "Development theory: force and acceleration", "theory": "For constant mass, net force F = ma. Acceleration is net force divided by mass. The SI units are N for force, kg for mass, and m/s² for acceleration.", "url": null},
+    {"id": "speed-theory-dev-v1", "version": 1, "concept_id": "speed-dev", "title": "Development theory: average speed", "theory": "Average speed is total distance divided by elapsed time. It is a scalar measured in m/s. Use distance, not displacement, for average speed.", "url": null},
+    {"id": "wave-theory-dev-v1", "version": 1, "concept_id": "wave-speed-dev", "title": "Development theory: wave equation", "theory": "Wave speed v = fλ, where f is frequency in Hz and λ is wavelength in metres. Multiplying Hz by metres gives m/s.", "url": null}
+  ],
+  "media": [],
+  "questions": [
+    {"id": "force-dev-v1", "version": 1, "text": "A net force of 6 N acts on a 2 kg trolley. What is its acceleration?", "options": [{"id": "a", "text": "3 m/s²"}, {"id": "b", "text": "12 m/s²"}, {"id": "c", "text": "0.33 m/s²"}], "correct_option_id": "a", "marks": 2, "concept_id": "force-dev", "resource_ids": ["force-theory-dev-v1"], "base_explanation": "Newton's second law gives a = F/m = 6 N / 2 kg = 3 m/s². Option a is correct.", "numeric_result": {"value": 3, "unit": "m/s²"}},
+    {"id": "speed-dev-v1", "version": 1, "text": "A student walks a total distance of 20 m in 5 s. What is the average speed?", "options": [{"id": "a", "text": "100 m/s"}, {"id": "b", "text": "4 m/s"}, {"id": "c", "text": "0.25 m/s"}], "correct_option_id": "b", "marks": 1, "concept_id": "speed-dev", "resource_ids": ["speed-theory-dev-v1"], "base_explanation": "Average speed = total distance / elapsed time = 20 m / 5 s = 4 m/s. Option b is correct.", "numeric_result": {"value": 4, "unit": "m/s"}},
+    {"id": "wave-dev-v1", "version": 1, "text": "A wave has frequency 5 Hz and wavelength 2 m. What is its speed?", "options": [{"id": "a", "text": "2.5 m/s"}, {"id": "b", "text": "0.4 m/s"}, {"id": "c", "text": "10 m/s"}], "correct_option_id": "c", "marks": 2, "concept_id": "wave-speed-dev", "resource_ids": ["wave-theory-dev-v1"], "base_explanation": "Using v = fλ, the speed is 5 Hz × 2 m = 10 m/s. Option c is correct.", "numeric_result": {"value": 10, "unit": "m/s"}}
+  ],
+  "paper": {"id": "physics-development-v1", "version": 1, "title": "Physics — development fixture", "status": "published", "review_status": "development_fixture", "is_development": true, "question_ids": ["force-dev-v1", "speed-dev-v1", "wave-dev-v1"], "marking_rule": "single_answer_no_penalty"}
+}

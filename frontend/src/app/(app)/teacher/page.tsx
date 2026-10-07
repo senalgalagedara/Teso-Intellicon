@@ -15,13 +15,16 @@ export default async function TeacherCoursesPage() {
   return (
     <>
       <div className="page-head">
-        <h1 className="gradient-text">My courses</h1>
-        <p className="page-subtitle">
-          Create a course, then invite students by the email address they signed up with.
-        </p>
+        <div>
+          <p className="eyebrow">Teacher</p>
+          <h1 style={{ marginTop: 8 }}>My courses</h1>
+          <p className="page-subtitle">
+            Create a course, then invite students by the email address they signed up with.
+          </p>
+        </div>
       </div>
 
-      <div className="glass-card">
+      <div className="card">
         <h2 className="card-title">New course</h2>
 
         <ActionForm action={createCourseAction} className="stack-sm">
@@ -49,7 +52,7 @@ export default async function TeacherCoursesPage() {
         ) : (
           <ul className="stack">
             {courses.map((course) => (
-              <li key={course.id} className="glass-card">
+              <li key={course.id} className="card">
                 <div className="row-between">
                   <div>
                     <h3 className="card-title">{course.title}</h3>
@@ -58,11 +61,11 @@ export default async function TeacherCoursesPage() {
                   <code className="join-code">{course.code}</code>
                 </div>
 
-                <p className="muted">
+                <p className="muted" style={{ margin: "12px 0" }}>
                   {course.student_count} enrolled, {course.pending_count} awaiting response.
                 </p>
 
-                <Link href={`/teacher/courses/${course.id}`} className="btn btn-primary">
+                <Link href={`/teacher/courses/${course.id}`} className="btn btn-primary btn-sm">
                   Manage roster
                 </Link>
               </li>

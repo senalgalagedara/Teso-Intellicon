@@ -11,13 +11,16 @@ export default async function PendingPage() {
   return (
     <>
       <div className="page-head">
-        <h1 className="gradient-text">Teacher approval pending</h1>
-        <p className="page-subtitle">
-          Your account can sign in, but course creation stays locked until an admin approves it.
-        </p>
+        <div>
+          <p className="eyebrow">Teacher</p>
+          <h1 style={{ marginTop: 8 }}>Teacher approval pending</h1>
+          <p className="page-subtitle">
+            Your account can sign in, but course creation stays locked until an admin approves it.
+          </p>
+        </div>
       </div>
 
-      <div className="glass-card">
+      <div className="card">
         <h2 className="card-title">Your request</h2>
 
         <dl className="detail-list">

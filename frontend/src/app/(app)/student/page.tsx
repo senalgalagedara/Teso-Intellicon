@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { respondToInviteAction } from "@/app/actions/student";
 import { ActionForm } from "@/components/action-form";
 import { requireRole } from "@/lib/auth/guards";
@@ -16,11 +17,29 @@ export default async function StudentCoursesPage() {
   return (
     <>
       <div className="page-head">
-        <h1 className="gradient-text">My courses</h1>
-        <p className="page-subtitle">
-          Invitations from teachers land here. Accepting one enrols you in that course.
-        </p>
+        <div>
+          <p className="eyebrow">Student</p>
+          <h1 style={{ marginTop: 8 }}>My courses</h1>
+          <p className="page-subtitle">
+            Invitations from teachers land here. Accepting one enrols you in that course.
+          </p>
+        </div>
       </div>
+
+      <section className="callout callout-ai">
+        <span className="callout-label">Adaptive practice</span>
+        <div className="row-between">
+          <div>
+            <h2 className="card-title">Your learning journey</h2>
+            <p className="muted" style={{ marginTop: 4, maxWidth: "56ch" }}>
+              Take a paper, revise missed theory, and compare your topic progress over time.
+            </p>
+          </div>
+          <Link href="/exams/self-assessment" className="btn btn-primary">
+            Self-assessment &amp; learning history
+          </Link>
+        </div>
+      </section>
 
       <section>
         <h2 className="section-title">Invitations ({invited.length})</h2>
@@ -30,7 +49,7 @@ export default async function StudentCoursesPage() {
         ) : (
           <ul className="stack">
             {invited.map((row) => (
-              <li key={row.enrollment_id} className="glass-card">
+              <li key={row.enrollment_id} className="card">
                 <div className="row-between">
                   <div>
                     <h3 className="card-title">{row.course_title}</h3>
@@ -41,24 +60,24 @@ export default async function StudentCoursesPage() {
                   <code className="join-code">{row.course_code}</code>
                 </div>
 
-                <p>{row.course_description ?? "No description provided."}</p>
+                <p style={{ margin: "12px 0" }}>
+                  {row.course_description ?? "No description provided."}
+                </p>
 
-                <div className="inline-form">
-                  <ActionForm action={respondToInviteAction} className="inline-form">
-                    <input type="hidden" name="enrollmentId" value={row.enrollment_id} />
-                    <button type="submit" name="response" value="accepted" className="btn btn-primary">
-                      Accept
-                    </button>
-                    <button
-                      type="submit"
-                      name="response"
-                      value="declined"
-                      className="btn btn-secondary"
-                    >
-                      Decline
-                    </button>
-                  </ActionForm>
-                </div>
+                <ActionForm action={respondToInviteAction} className="inline-form">
+                  <input type="hidden" name="enrollmentId" value={row.enrollment_id} />
+                  <button type="submit" name="response" value="accepted" className="btn btn-primary">
+                    Accept
+                  </button>
+                  <button
+                    type="submit"
+                    name="response"
+                    value="declined"
+                    className="btn btn-secondary"
+                  >
+                    Decline
+                  </button>
+                </ActionForm>
               </li>
             ))}
           </ul>
@@ -73,15 +92,19 @@ export default async function StudentCoursesPage() {
         ) : (
           <ul className="stack">
             {active.map((row) => (
-              <li key={row.enrollment_id} className="glass-card">
+              <li key={row.enrollment_id} className="card">
                 <div className="row-between">
-                  <h3 className="card-title">{row.course_title}</h3>
+                  <div>
+                    <h3 className="card-title">{row.course_title}</h3>
+                    <p className="muted">
+                      {row.teacher_name ?? "A teacher"} &middot; {row.teacher_email}
+                    </p>
+                  </div>
                   <span className="badge badge-green">enrolled</span>
                 </div>
-                <p className="muted">
-                  {row.teacher_name ?? "A teacher"} &middot; {row.teacher_email}
-                </p>
-                {row.course_description ? <p>{row.course_description}</p> : null}
+                {row.course_description ? (
+                  <p style={{ marginTop: 10 }}>{row.course_description}</p>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -93,7 +116,11 @@ export default async function StudentCoursesPage() {
           <h2 className="section-title">Declined ({declined.length})</h2>
           <ul className="stack">
             {declined.map((row) => (
-              <li key={row.enrollment_id} className="glass-card row-between">
+              <li
+                key={row.enrollment_id}
+                className="card row-between"
+                style={{ alignItems: "center" }}
+              >
                 <span>{row.course_title}</span>
                 <span className="badge badge-red">declined</span>
               </li>

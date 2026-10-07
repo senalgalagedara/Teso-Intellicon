@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/dal";
 import { isSelfAssignableRole } from "@/lib/auth/roles";
 import { requestTeacherAccess } from "@/lib/db/queries";
+import { actionError } from "@/app/actions/errors";
 
 export type ActionState = {
   error?: string;
@@ -29,7 +30,12 @@ export async function finishSignUpAction(
     return { error: "Choose whether you are joining as a student or a teacher." };
   }
 
-  const user = await getCurrentUser();
+  let user;
+  try {
+    user = await getCurrentUser();
+  } catch (error) {
+    return actionError("finishSignUp.readSession", error);
+  }
 
   if (!user) {
     return { error: "Your account was created but no session was found. Please sign in." };
@@ -46,7 +52,11 @@ export async function finishSignUpAction(
         ? rawNote.trim().slice(0, 500)
         : null;
 
-    await requestTeacherAccess(user.id, user.email, note);
+    try {
+      await requestTeacherAccess(user.id, user.email, note);
+    } catch (error) {
+      return actionError("finishSignUp.requestTeacherAccess", error);
+    }
     redirect("/pending");
   }
 
