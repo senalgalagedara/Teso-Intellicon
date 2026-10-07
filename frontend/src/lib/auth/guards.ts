@@ -40,6 +40,6 @@ export function homeForRole(role: UserRole): string {
     case "teacher_pending":
       return "/pending";
     case "student":
-      return "/student";
+      return "/dashboard";
   }
 }

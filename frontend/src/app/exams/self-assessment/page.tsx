@@ -1,5 +1,5 @@
-import SelfAssessmentDashboard from "@/components/self-assessment-dashboard";
+import { redirect } from "next/navigation";
 
 export default function StandaloneSelfAssessmentPage() {
-  return <SelfAssessmentDashboard showTopNav={true} />;
+  redirect("/dashboard");
 }

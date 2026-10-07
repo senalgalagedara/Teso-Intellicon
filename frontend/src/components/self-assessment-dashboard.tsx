@@ -407,9 +407,9 @@ export default function SelfAssessmentDashboard({
               <span>Home</span>
             </Link>
 
-            <Link href="/student" className={styles.navLink}>
+            <Link href="/dashboard" className={styles.navLink}>
               <LayoutDashboard size={15} />
-              <span>Courses</span>
+              <span>Dashboard</span>
             </Link>
           </div>
 
@@ -444,20 +444,12 @@ export default function SelfAssessmentDashboard({
                   </div>
                   <div className={styles.dropdownDivider} />
                   <Link
-                    href="/student"
+                    href="/dashboard"
                     className={styles.dropdownItem}
                     onClick={() => setProfileMenuOpen(false)}
                   >
                     <User size={15} />
-                    <span>Student Dashboard</span>
-                  </Link>
-                  <Link
-                    href="/student/progress"
-                    className={styles.dropdownItem}
-                    onClick={() => setProfileMenuOpen(false)}
-                  >
-                    <BarChart2 size={15} />
-                    <span>Topic Progress</span>
+                    <span>Dashboard</span>
                   </Link>
                   <div className={styles.dropdownDivider} />
                   <button
@@ -490,7 +482,7 @@ export default function SelfAssessmentDashboard({
       {/* 2. SUB-HEADER / DASHBOARD TITLE */}
       <div className={styles.dashHeader}>
         <div>
-          <h2 className={styles.dashTitle}>Self-Assessment &amp; Practice</h2>
+          <h1 className={styles.dashTitle}>Self-Assessment &amp; Practice</h1>
           <p className={styles.dashSubtitle}>
             Practice questions one by one with immediate feedback and test your limits in unlimited mode.
           </p>
