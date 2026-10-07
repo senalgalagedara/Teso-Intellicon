@@ -1,6 +1,7 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   BookOpen,
   Trophy,
@@ -9,15 +10,20 @@ import {
   CheckCircle2,
   XCircle,
   ArrowRight,
-  RotateCcw,
   Sparkles,
   StopCircle,
   Award,
   Check,
   Zap,
-  ChevronRight,
   BarChart2,
+  Home,
+  LogOut,
+  User,
+  GraduationCap,
+  ChevronDown,
+  LayoutDashboard,
 } from "lucide-react";
+import { authClient } from "@/lib/auth/client";
 import { ApiError, readProblem, messageForError } from "@/lib/api/problems";
 import type {
   Exam,
@@ -65,8 +71,17 @@ function Media({ ids, sid }: { ids: string[]; sid: string }) {
 }
 
 export default function SelfAssessmentDashboard() {
+  const router = useRouter();
+
   // Navigation / Tabs: 'practice' | 'history'
   const [activeTab, setActiveTab] = useState<"practice" | "history">("practice");
+
+  // User Profile & Header State
+  const [userName, setUserName] = useState<string>("Student");
+  const [userEmail, setUserEmail] = useState<string>("student@teso.lk");
+  const [profileMenuOpen, setProfileMenuOpen] = useState<boolean>(false);
+  const [loggingOut, setLoggingOut] = useState<boolean>(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   // Core Data
   const [papers, setPapers] = useState<Paper[]>([]);
@@ -94,13 +109,24 @@ export default function SelfAssessmentDashboard() {
   const [isNewHighScore, setIsNewHighScore] = useState<boolean>(false);
   const [runFinished, setRunFinished] = useState<boolean>(false);
 
-  // Results State (when reviewing or stopping)
+  // Results State (when reviewing past paper)
   const [result, setResult] = useState<Result | null>(null);
 
   // Language filter
   const [selectedLanguage, setSelectedLanguage] = useState("en");
 
-  // Load High Score from localStorage on client
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Load High Score & User Profile on client
   useEffect(() => {
     try {
       const savedHigh = localStorage.getItem("teso_self_assessment_high_score");
@@ -110,7 +136,37 @@ export default function SelfAssessmentDashboard() {
     } catch {
       // Local storage unavailable
     }
+
+    // Fetch user details from session
+    async function loadUser() {
+      try {
+        const { data: sessionData } = await authClient.getSession();
+        if (sessionData?.user) {
+          setUserName(sessionData.user.name || "Student");
+          setUserEmail(sessionData.user.email || "student@teso.lk");
+        }
+      } catch {
+        // Fallback to defaults
+      }
+    }
+    void loadUser();
   }, []);
+
+  // Logout Handler
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      document.cookie = "teso_demo=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      await authClient.signOut();
+      router.replace("/sign-in");
+      router.refresh();
+    } catch (e) {
+      console.error("Sign out failed", e);
+      router.replace("/sign-in");
+    } finally {
+      setLoggingOut(false);
+    }
+  };
 
   const openSession = useCallback(async (sid: string) => {
     const e = await api<Exam>(`sessions/${sid}`);
@@ -129,7 +185,6 @@ export default function SelfAssessmentDashboard() {
       setResult(r);
       setHistory(h);
     } else {
-      // Prepare unlimited question pool
       setQuestionPool(e.questions || []);
       setPoolIndex(0);
       setCurrentScore(0);
@@ -240,7 +295,6 @@ export default function SelfAssessmentDashboard() {
         selected_option: selectedOption,
       });
 
-      // Save checked state for this iteration
       setChecks((prev) => ({ ...prev, [currentQUniqueKey]: res }));
       setQuestionsAnswered((prev) => prev + 1);
 
@@ -281,7 +335,6 @@ export default function SelfAssessmentDashboard() {
   const handleStopAndSave = async () => {
     if (!exam) return;
     await runAction(async () => {
-      // Finalize answers for session
       const answers = Object.entries(choices).map(([key, opt]) => ({
         question_id: key.split("-")[0],
         selected_option: opt,
@@ -290,7 +343,6 @@ export default function SelfAssessmentDashboard() {
       await api(`sessions/${exam.session_id}/submit`, "POST", { answers });
       setRunFinished(true);
 
-      // Check if beat high score
       if (currentScore > highScore) {
         setHighScore(currentScore);
         setIsNewHighScore(true);
@@ -335,39 +387,117 @@ export default function SelfAssessmentDashboard() {
 
   return (
     <div className={styles.dashboard}>
-      {/* Top Header */}
-      <header className={styles.dashHeader}>
+      {/* 1. TOP HEADER WITH HOME, BRAND, PROFILE & LOGOUT */}
+      <header className={styles.topNav}>
+        {/* Left: Brand & Home Navigation */}
+        <div className={styles.navLeft}>
+          <Link href="/" className={styles.navBrand}>
+            <div className={styles.brandIcon}>
+              <GraduationCap size={18} />
+            </div>
+            <span>Teso Intellicon</span>
+          </Link>
+
+          <div className={styles.navDivider} />
+
+          {/* Home Page Redirection Button */}
+          <Link href="/" className={styles.navHomeBtn}>
+            <Home size={15} />
+            <span>Home</span>
+          </Link>
+
+          {/* Student Portal / Courses Link */}
+          <Link href="/student" className={styles.navLink}>
+            <LayoutDashboard size={15} />
+            <span>Courses</span>
+          </Link>
+        </div>
+
+        {/* Right: High Score, Profile Button & Logout */}
+        <div className={styles.navRight}>
+          <div className={styles.headerHighScorePill}>
+            <Trophy size={15} color="#d97706" />
+            <span>High: {highScore} pts</span>
+          </div>
+
+          {/* Profile Button with Interactive Dropdown */}
+          <div className={styles.profileMenuContainer} ref={profileMenuRef}>
+            <button
+              type="button"
+              className={styles.profileBtn}
+              onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+              aria-label="User Profile"
+            >
+              <div className={styles.avatar}>
+                {userName.charAt(0).toUpperCase()}
+              </div>
+              <span className={styles.profileName}>{userName}</span>
+              <ChevronDown
+                size={14}
+                className={`${styles.chevronIcon} ${profileMenuOpen ? styles.chevronOpen : ""}`}
+              />
+            </button>
+
+            {profileMenuOpen && (
+              <div className={styles.profileDropdown}>
+                <div className={styles.dropdownHeader}>
+                  <p className={styles.dropdownName}>{userName}</p>
+                  <p className={styles.dropdownEmail}>{userEmail}</p>
+                </div>
+                <div className={styles.dropdownDivider} />
+                <Link
+                  href="/student"
+                  className={styles.dropdownItem}
+                  onClick={() => setProfileMenuOpen(false)}
+                >
+                  <User size={15} />
+                  <span>Student Dashboard</span>
+                </Link>
+                <Link
+                  href="/student/progress"
+                  className={styles.dropdownItem}
+                  onClick={() => setProfileMenuOpen(false)}
+                >
+                  <BarChart2 size={15} />
+                  <span>Topic Progress</span>
+                </Link>
+                <div className={styles.dropdownDivider} />
+                <button
+                  type="button"
+                  className={styles.dropdownItemDanger}
+                  disabled={loggingOut}
+                  onClick={handleLogout}
+                >
+                  <LogOut size={15} />
+                  <span>{loggingOut ? "Signing out..." : "Sign Out"}</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Dedicated Header Logout Button */}
+          <button
+            type="button"
+            className={styles.logoutBtn}
+            onClick={handleLogout}
+            disabled={loggingOut}
+            title="Log out of account"
+          >
+            <LogOut size={15} />
+            <span>{loggingOut ? "..." : "Log Out"}</span>
+          </button>
+        </div>
+      </header>
+
+      {/* 2. SUB-HEADER / DASHBOARD TITLE */}
+      <div className={styles.dashHeader}>
         <div>
           <h1 className={styles.dashTitle}>Self-Assessment Dashboard</h1>
           <p className={styles.dashSubtitle}>
             Practice questions one by one with immediate feedback and test your limits in unlimited mode.
           </p>
         </div>
-
-        {/* Global High Score Pill in Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              background: "#ffffff",
-              border: "1px solid #e2e8f0",
-              padding: "8px 16px",
-              borderRadius: "999px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-            }}
-          >
-            <Trophy size={18} color="#d97706" />
-            <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#64748b" }}>
-              High Score:
-            </span>
-            <span style={{ fontSize: "1rem", fontWeight: 700, color: "#0f172a" }}>
-              {highScore} pts
-            </span>
-          </div>
-        </div>
-      </header>
+      </div>
 
       {/* Alerts */}
       {error && (
@@ -453,7 +583,7 @@ export default function SelfAssessmentDashboard() {
         </p>
       )}
 
-      {/* MAIN DASHBOARD CONTENT (When not taking a test or reviewing) */}
+      {/* 3. MAIN DASHBOARD CONTENT */}
       {!exam && !result && !loading && !showAuth && (
         <>
           {/* Top Navigation Tabs */}
@@ -714,7 +844,7 @@ export default function SelfAssessmentDashboard() {
                 )}
               </div>
 
-              {/* Concept Mastery Breakdown if available in History */}
+              {/* Concept Mastery Breakdown */}
               {history && history.concepts.length > 0 && (
                 <div className={styles.historyCard}>
                   <h3 className={styles.sectionTitle} style={{ marginBottom: "16px" }}>
@@ -761,7 +891,7 @@ export default function SelfAssessmentDashboard() {
         </>
       )}
 
-      {/* PRACTICE MODE (Unlimited Questions) */}
+      {/* 4. PRACTICE MODE (Unlimited Questions) */}
       {exam && !runFinished && !result && exam.status === "in_progress" && currentQ && (
         <div className={styles.practiceContainer}>
           {/* Top Live Bar */}
@@ -953,7 +1083,7 @@ export default function SelfAssessmentDashboard() {
         </div>
       )}
 
-      {/* RUN FINISHED SUMMARY / HIGH SCORE CELEBRATION */}
+      {/* 5. RUN FINISHED SUMMARY / HIGH SCORE CELEBRATION */}
       {runFinished && (
         <div className={styles.summaryCard}>
           <div className={styles.summaryIconWrap}>
@@ -1007,7 +1137,7 @@ export default function SelfAssessmentDashboard() {
         </div>
       )}
 
-      {/* COMPREHENSIVE RESULT REVIEW (When opening past session) */}
+      {/* 6. COMPREHENSIVE RESULT REVIEW (When opening past session) */}
       {result && (
         <div style={{ animation: "fadeIn 0.25s ease-out" }}>
           <div className={styles.questionCard}>
