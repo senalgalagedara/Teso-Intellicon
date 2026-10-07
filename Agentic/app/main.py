@@ -17,6 +17,28 @@ from app.routers import health, ai, documents, engine, assessments
 async def lifespan(app: FastAPI):
     # Startup: initialize database pool
     await init_db_pool()
+
+    # In development, auto-ensure assessment tables and initial fixtures exist
+    if settings.ENVIRONMENT == "development":
+        try:
+            from app.assessment.cli import migrate
+            from app.assessment import db
+            from sqlalchemy import select
+            migrate(db.engine)
+            with db.engine.connect() as conn:
+                existing_paper = conn.execute(select(db.papers.c.id)).first()
+            if not existing_paper:
+                from pathlib import Path
+                from app.assessment.content import Package, import_package
+                from app.assessment.storage import Storage
+                fixture_path = Path(__file__).resolve().parent.parent / "fixtures" / "physics-development.json"
+                if fixture_path.exists():
+                    pkg = Package.model_validate_json(fixture_path.read_text(encoding="utf-8"))
+                    import_package(db.engine, pkg, Storage())
+        except Exception as e:
+            import logging
+            logging.getLogger("assessment.startup").warning(f"Could not auto-initialize assessment schema: {e}")
+
     yield
     # Shutdown: close database pool
     await close_db_pool()
