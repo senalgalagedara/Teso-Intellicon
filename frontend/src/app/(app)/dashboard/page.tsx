@@ -8,14 +8,21 @@ import SelfAssessmentDashboard from "@/components/self-assessment-dashboard";
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const user = await requireUser();
+  const { tab } = (await searchParams) || {};
+  const activeTab = tab === "history" ? "history" : "practice";
 
   if (user.role === "student") {
     return (
       <SelfAssessmentDashboard
         showTopNav={false}
         embedded={true}
+        initialTab={activeTab}
         initialUserName={user.name}
         initialUserEmail={user.email}
       />

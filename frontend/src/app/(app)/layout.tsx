@@ -1,3 +1,4 @@
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -28,7 +29,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
         <nav className="app-nav" aria-label="Main">
           <span className="app-nav-label">Menu</span>
-          <SidebarNav links={roleLinks(user.role)} />
+          <Suspense fallback={null}>
+            <SidebarNav links={roleLinks(user.role)} />
+          </Suspense>
         </nav>
 
         <div className="sidebar-foot">
@@ -48,11 +51,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 }
 
 function roleLinks(role: string): { href: string; label: string }[] {
-  const links: { href: string; label: string }[] = [{ href: "/dashboard", label: "Overview" }];
-
   if (role === "student") {
-    return links;
+    return [
+      { href: "/dashboard", label: "Practice & Subjects" },
+      { href: "/dashboard?tab=history", label: "Attempt History" },
+    ];
   }
+
+  const links: { href: string; label: string }[] = [{ href: "/dashboard", label: "Overview" }];
 
   if (role === "teacher") {
     links.push({ href: "/teacher", label: "Courses" });

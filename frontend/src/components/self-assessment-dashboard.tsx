@@ -73,18 +73,28 @@ function Media({ ids, sid }: { ids: string[]; sid: string }) {
 export default function SelfAssessmentDashboard({
   showTopNav = true,
   embedded = false,
+  initialTab = "practice",
   initialUserName,
   initialUserEmail,
 }: {
   showTopNav?: boolean;
   embedded?: boolean;
+  initialTab?: "practice" | "history";
   initialUserName?: string;
   initialUserEmail?: string;
 }) {
   const router = useRouter();
 
   // Navigation / Tabs: 'practice' | 'history'
-  const [activeTab, setActiveTab] = useState<"practice" | "history">("practice");
+  const [activeTab, setActiveTab] = useState<"practice" | "history">(initialTab);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+    if (initialTab === "history") {
+      setExam(null);
+      setResult(null);
+    }
+  }, [initialTab]);
 
   // User Profile & Header State
   const [userName, setUserName] = useState<string>(initialUserName || "Student");
@@ -576,25 +586,27 @@ export default function SelfAssessmentDashboard({
       {/* 3. MAIN DASHBOARD CONTENT */}
       {!exam && !result && !loading && !showAuth && (
         <>
-          {/* Top Navigation Tabs */}
-          <div className={styles.tabNav}>
-            <button
-              type="button"
-              className={`${styles.tabBtn} ${activeTab === "practice" ? styles.tabBtnActive : ""}`}
-              onClick={() => setActiveTab("practice")}
-            >
-              <BookOpen size={16} />
-              Practice &amp; Subjects
-            </button>
-            <button
-              type="button"
-              className={`${styles.tabBtn} ${activeTab === "history" ? styles.tabBtnActive : ""}`}
-              onClick={() => setActiveTab("history")}
-            >
-              <HistoryIcon size={16} />
-              Attempt History ({sessions.length})
-            </button>
-          </div>
+          {/* Top Navigation Tabs - hidden when embedded since Practice & Subjects and Attempt History are in the sidebar */}
+          {!embedded && (
+            <div className={styles.tabNav}>
+              <button
+                type="button"
+                className={`${styles.tabBtn} ${activeTab === "practice" ? styles.tabBtnActive : ""}`}
+                onClick={() => setActiveTab("practice")}
+              >
+                <BookOpen size={16} />
+                Practice &amp; Subjects
+              </button>
+              <button
+                type="button"
+                className={`${styles.tabBtn} ${activeTab === "history" ? styles.tabBtnActive : ""}`}
+                onClick={() => setActiveTab("history")}
+              >
+                <HistoryIcon size={16} />
+                Attempt History ({sessions.length})
+              </button>
+            </div>
+          )}
 
           {/* Quick KPI Stats Row */}
           <div className={styles.statsGrid}>
