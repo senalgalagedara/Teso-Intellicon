@@ -9,7 +9,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.db import init_db_pool, close_db_pool
-from app.routers import health, ai, documents, engine
+from app.errors import AccessLogMiddleware, install_exception_handlers
+from app.routers import health, ai, documents, engine, assessments
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -46,6 +48,8 @@ app.include_router(health.router)
 app.include_router(ai.router)
 app.include_router(documents.router)
 app.include_router(engine.router) # Revision Engine /v1/*
+app.include_router(assessments.router) # Student Assessments /api/assessments/*
+
 
 @app.get("/")
 async def root():
