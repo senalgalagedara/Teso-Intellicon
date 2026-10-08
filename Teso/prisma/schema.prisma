@@ -1,0 +1,563 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  STUDENT
+  HOST @map("host")
+}
+
+enum PaperStatus {
+  PENDING
+  UPLOADED
+}
+
+enum SessionStatus {
+  WAITING   // Lobby phase - host admitting students
+  ACTIVE    // Exam is running
+  ENDED     // Exam finished
+}
+
+enum ParticipantStatus {
+  WAITING   // In lobby, not yet admitted
+  ADMITTED  // Admitted by host, allowed to join without waiting
+  DECLINED  // Declined by host
+  IN_EXAM   // Currently taking exam
+  SUBMITTED // Submitted exam
+  KICKED    // Removed from exam
+}
+
+model User {
+  id                  String            @id @default(cuid())
+  name                String?
+  email               String?           @unique
+  emailVerified       DateTime?
+  image               String?
+  password            String?
+  firebaseUid         String?           @unique
+  refreshTokenHash    String?           @db.Text
+  failedLoginAttempts Int               @default(0)
+  accountLockedUntil  DateTime?
+  accounts            Account[]
+  sessions            Session[]
+  
+  // Custom fields
+  role                Role              @default(STUDENT)
+  studentId           String?           @unique
+  age                 Int?
+  grade               String?
+  examType            String?           // "O/L" or "A/L"
+  monthsToExam        Int?
+  stream              String?           // For A/L
+  subjects            String[]          // For A/L (3 main subjects)
+  isGuest             Boolean           @default(false)
+
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  // Teso relations
+  todos               Todo[]
+  stickyNotes         StickyNote[]
+  marks               PPmarks[]
+  events              Event[]
+  paperAccesses       PaperAccess[]     // Tuition Paper Access
+  studyPlans          StudyPlan[]
+  paperCoverages      PaperCoverage[]
+  timetableTasks      TimetableTask[]
+
+  // Exam relations
+  hostedExams         ExamPaper[]       @relation("HostExams")
+  participants        ExamParticipant[]
+  examPaperAccesses   ExamPaperAccess[] // Exam Paper Access (renamed from PaperAccess)
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model StickyNote {
+  id        String   @id @default(cuid())
+  title     String
+  color     String   @default("#E0BBE4")
+  x         Int      @default(50)
+  y         Int      @default(50)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  todos     Todo[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Todo {
+  id           String      @id @default(cuid())
+  title        String
+  completed    Boolean     @default(false)
+  category     String?
+  dueDate      DateTime?
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+  stickyNoteId String?
+  stickyNote   StickyNote? @relation(fields: [stickyNoteId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model PPmarks {
+  id         String   @id @default(cuid())
+  subject    String
+  score      Float
+  total      Float
+  part2Score Float?
+  part2Total Float?
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  date       DateTime @default(now())
+  paperId    String?
+  paperName  String?
+  type       String?  // "TUITION" | "PAST_PAPER"
+
+  @@map("Mark")
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  title     String
+  startTime DateTime
+  endTime   DateTime
+  location  String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model TimetableTask {
+  id          String   @id @default(cuid())
+  title       String
+  startTime   String   // HH:MM
+  endTime     String   // HH:MM
+  date        String   // YYYY-MM-DD
+  priority    String   // 'low' | 'medium' | 'high'
+  color       String?  // Hex color code or preset name
+  description String?
+  zoomLink    String?
+  teamsLink   String?
+  meetLink    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PastPaper {
+  id             Int             @id @default(autoincrement())
+  paperId        String          @map("paperid") @db.VarChar(50)
+  subjectName    String          @map("subject_name") @db.VarChar(100)
+  paperYear      Int             @map("paper_year")
+  questionNumber Int             @map("question_number")
+  questionText   String?         @map("question_text") @db.Text
+  questionImage  String?
+  answer1        String?         @db.Text
+  answer2        String?         @db.Text
+  answer3        String?         @db.Text
+  answer4        String?         @db.Text
+  answer5        String?         @db.Text
+  answer1Image   String?         @db.Text
+  answer2Image   String?         @db.Text
+  answer3Image   String?         @db.Text
+  answer4Image   String?         @db.Text
+  answer5Image   String?         @db.Text
+  correctAnswer  Int?            @map("correct_answer")
+  correctAnswer2 Int?            @map("correct_answer2")
+  images         QuestionImage[]
+
+  @@map("pastpaper")
+}
+
+model QuestionImage {
+  id          String    @id @default(cuid())
+  url         String    @db.Text
+  filePath    String    @db.Text
+  order       Int       @default(0)
+  pastPaperId Int
+  pastPaper   PastPaper @relation(fields: [pastPaperId], references: [id], onDelete: Cascade)
+
+  @@map("questionimage")
+}
+
+model PPmarknflag {
+  id     String @id @default(cuid())
+  userId String
+
+  paperId   String
+  paperName String?
+  subject   String?
+
+  score          Float
+  totalQuestions Int
+
+  // Flagged/Marked Question Analysis
+  flaggedIndices      Int[] // List of question numbers (indexes) marked as "Not Sure"
+  flaggedCorrectCount Int   // How many marked questions were actually correct
+  flaggedWrongCount   Int   // How many marked questions were wrong
+
+  createdAt DateTime @default(now())
+
+  // Relation to detailed time tracking
+  questionStats PPtimeStat[]
+
+  @@map("ExamStat")
+}
+
+model PPtimeStat {
+  id             String      @id @default(cuid())
+  examStatId     String
+  examStat       PPmarknflag @relation(fields: [examStatId], references: [id], onDelete: Cascade)
+  questionIndex  Int         // The question number/index
+  timeSpent      Int         // Time spent in seconds
+  isFlagged      Boolean     @default(false)
+  isCorrect      Boolean     @default(false)
+  selectedOption Int?        // The option the user chose (0-4)
+
+  @@map("ExamQuestionStat")
+}
+
+model TermTestMark {
+  id     String @id @default(cuid())
+  userId String
+
+  grade      Int    // 12 or 13
+  term       Int    // 1, 2, or 3
+  subject    String
+  marks      Float
+  totalMarks Float  @default(100.0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, grade, term, subject])
+}
+
+model TutionPaper {
+  id            String        @id @default(cuid())
+  code          String        @unique
+  title         String
+  category      String?
+  categoryId    String?
+  categoryRel   Category?     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  examDate      DateTime
+  questionUrl   String
+  answerUrl     String
+
+  status        PaperStatus   @default(PENDING)
+  questionCount Int           @default(0)
+  totalMarks    Float         @default(0.0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  accesses      PaperAccess[]
+}
+
+model TutionPaperDetails {
+  id             String                 @id @default(cuid())
+  paperId        String
+  questionNumber Int
+  topic          String?                // e.g., "Linear Equations"
+  difficulty     String?
+  questionText   String?                @db.Text
+  questionImage  String?                // Main question image
+  answer1        String?                @db.Text
+  answer2        String?                @db.Text
+  answer3        String?                @db.Text
+  answer4        String?                @db.Text
+  answer5        String?                @db.Text
+  answer1Image   String?
+  answer2Image   String?
+  answer3Image   String?
+  answer4Image   String?
+  answer5Image   String?
+  correctAnswer1 Int?
+  correctAnswer2 Int?
+  studentResults TutionQuestionResult[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  @@unique([paperId, questionNumber]) // Prevent duplicate Q1s for same paper
+}
+
+model TutionQuestionResult {
+  id             String             @id @default(cuid())
+  paperDetailId  String
+  paperDetail    TutionPaperDetails @relation(fields: [paperDetailId], references: [id], onDelete: Cascade)
+  userId         String
+  selectedOption Int?               // e.g., 0-4 for options
+  numericAnswer  Float?             // numeric answer if applicable
+  timeSpent      Int                @default(0) // seconds spent on this question
+  isCorrect      Boolean            @default(false)
+  isFlagged      Boolean            @default(false)
+
+  answeredAt     DateTime           @default(now())
+
+  @@index([paperDetailId])
+  @@index([userId])
+}
+
+model PaperAccess {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  paperId         String
+  paper           TutionPaper @relation(fields: [paperId], references: [id])
+  classCardNumber String?
+  accessedAt      DateTime    @default(now())
+
+  @@unique([userId, paperId])
+}
+
+model Category {
+  id        String        @id @default(cuid())
+  name      String        @unique
+
+  papers    TutionPaper[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model PaperCoverage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  /// Composite key: "mcq|<topicId>|<year>" or "p2|<year>|<qKey>"
+  cellKey   String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, cellKey])
+  @@index([userId])
+  @@map("paper_coverage")
+}
+
+model StudyPlan {
+  id          String             @id @default(cuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id])
+  months      Int
+  hoursPerDay Float
+  offDays     Int
+  totalDays   Int
+  totalHours  Float
+  planData    Json               // Array of day objects from the algorithm
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  dayProgress StudyDayProgress[]
+
+  @@map("study_plan")
+}
+
+model StudyDayProgress {
+  id              String    @id @default(cuid())
+  planId          String
+  plan            StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  userId          String
+  dayNumber       Int       // matches DayPlan.day
+  lessonDone      Boolean   @default(false)
+  mcqDone         Boolean   @default(false)
+  p2Done          Boolean   @default(false)
+  timeSpentLesson Int?
+  timeSpentMcq    Int?
+  timeSpentP2     Int?
+  dayCompleted    Boolean   @default(false) // true when all three are done
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([planId, dayNumber])
+  @@index([userId])
+  @@map("study_day_progress")
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+// Exam platform specific models
+model ExamPaper {
+  id                 String             @id @default(cuid())
+  code               String             @unique
+  title              String
+  examDate           DateTime
+  questionUrl        String?            
+  answerUrl          String?            
+  
+  hostId             String
+  host               User               @relation("HostExams", fields: [hostId], references: [id], onDelete: Cascade)
+  
+  status             PaperStatus        @default(PENDING)
+  questionCount      Int                @default(0)
+  totalMarks         Float              @default(0.0)
+  numberOfStudents   Int                @default(0)
+  answersPerQuestion Int                @default(5)
+  examDurationMins   Int                @default(60)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  
+  accesses           ExamPaperAccess[]
+  questions          ExamPaperDetails[]
+  sessions           ExamSession[]
+
+  @@index([hostId])
+  @@index([createdAt])
+}
+
+model ExamPaperDetails {
+  id             String                 @id @default(cuid())
+  paperId        String
+  paper          ExamPaper              @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  questionNumber Int
+  topic          String? 
+  difficulty     String                 @default("Medium")
+  questionText   String                 @db.Text
+  questionImage  String? 
+  answer1        String                 @db.Text
+  answer2        String                 @db.Text
+  answer3        String?                @db.Text 
+  answer4        String?                @db.Text
+  answer5        String?                @db.Text
+  answer1Image   String?
+  answer2Image   String?
+  answer3Image   String?
+  answer4Image   String?
+  answer5Image   String?
+  correctAnswer1 Int
+  correctAnswer2 Int?
+  studentResults ExamQuestionResult[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  @@unique([paperId, questionNumber])
+  @@index([paperId])
+}
+
+model ExamQuestionResult {
+  id             String             @id @default(cuid())
+  paperDetailId  String
+  paperDetail    ExamPaperDetails   @relation(fields: [paperDetailId], references: [id], onDelete: Cascade)
+  userId         String             // (Matches User ID)
+  selectedOption Int? 
+  numericAnswer  Float? 
+  timeSpent      Int                @default(0) 
+  isCorrect      Boolean            @default(false)
+  isFlagged      Boolean            @default(false)
+
+  answeredAt     DateTime           @default(now())
+
+  @@index([paperDetailId])
+  @@index([userId])
+}
+
+model ExamPaperAccess {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  paperId         String
+  paper           ExamPaper   @relation(fields: [paperId], references: [id])
+  classCardNumber String?
+  accessedAt      DateTime    @default(now())
+
+  @@unique([userId, paperId])
+  @@index([paperId])
+  @@map("ExamPaperAccess")
+}
+
+model ExamSession {
+  id            String        @id @default(cuid())
+  paperId       String
+  paper         ExamPaper     @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  status        SessionStatus @default(WAITING)
+  startedAt     DateTime?
+  endedAt       DateTime?
+  durationMins  Int           @default(60)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  participants  ExamParticipant[]
+
+  @@index([paperId])
+  @@index([status])
+}
+
+model ExamParticipant {
+  id            String            @id @default(cuid())
+  sessionId     String
+  session       ExamSession       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User              @relation(fields: [userId], references: [id])
+  
+  fullName      String
+  classCode     String
+  status        ParticipantStatus @default(WAITING)
+  
+  answeredCount Int               @default(0)
+  totalQuestions Int              @default(0)
+  score         Float?
+  
+  admittedAt    DateTime?
+  startedAt     DateTime?
+  submittedAt   DateTime?
+  lastSeenAt    DateTime          @default(now())
+  
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([status])
+}

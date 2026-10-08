@@ -1,0 +1,745 @@
+@custom-variant dark (&:is(.dark *));
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* =====================================================
+   BOARD CONTAINER — LIGHT DEFAULT
+   ===================================================== */
+
+.board-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  font-family: 'Outfit', sans-serif;
+
+  /* Light: clean white */
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(ellipse at 10% 10%, rgba(199, 210, 254, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 90%, rgba(196, 255, 191, 0.2) 0%, transparent 50%);
+  transition: background-color 0.4s ease, background-image 0.4s ease;
+}
+
+/* Light: dot grid — more visible */
+.cork-texture {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.18) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 1;
+  transition: opacity 0.4s;
+}
+
+/* =====================================================
+   DARK OVERRIDES — board + texture
+   ===================================================== */
+
+html.dark .board-container {
+  background-color: #0d0f12;
+  background-image:
+    radial-gradient(ellipse at 15% 20%, rgba(90, 100, 120, 0.2) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 80%, rgba(60, 70, 95, 0.15) 0%, transparent 55%);
+}
+
+html.dark .cork-texture {
+  background-image:
+    linear-gradient(rgba(180,190,210,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,190,210,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* =====================================================
+   AMBIENT GLOW — dark-only, rendered behind notes
+   ===================================================== */
+
+.note-ambient-glow {
+  position: absolute;
+  width: 300px;
+  height: 220px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.13;
+  filter: blur(65px);
+  pointer-events: none;
+  z-index: 1;
+  transition: left 0.08s, top 0.08s;
+}
+
+/* =====================================================
+   TOOLBAR
+   ===================================================== */
+
+.board-toolbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 9px 20px;
+  transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+
+  /* Light */
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 1px 12px rgba(0,0,0,0.06);
+}
+
+html.dark .board-toolbar {
+  background: rgba(8, 10, 14, 0.85);
+  border-bottom: 1px solid rgba(180, 190, 220, 0.07);
+  box-shadow: 0 1px 30px rgba(0,0,0,0.6);
+}
+
+/* ===== Add Note Button ===== */
+
+/* Light */
+.add-note-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 3px 12px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.add-note-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.add-note-btn:active { transform: scale(0.97); }
+
+/* Dark */
+html.dark .add-note-btn {
+  background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+  color: #0d0f14;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.1),
+    0 4px 14px rgba(0,0,0,0.5),
+    0 0 20px rgba(148, 163, 184, 0.2);
+}
+
+html.dark .add-note-btn:hover {
+  background: linear-gradient(135deg, #f1f5f9, #cbd5e1);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.18),
+    0 6px 20px rgba(0,0,0,0.5),
+    0 0 30px rgba(203, 213, 225, 0.3);
+}
+
+/* =====================================================
+   CANVAS
+   ===================================================== */
+
+.board-canvas {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 50px);
+  overflow: hidden;
+}
+
+/* =====================================================
+   EMPTY STATE
+   ===================================================== */
+
+.empty-board {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.mobile-empty {
+  position: relative;
+  min-height: 300px;
+}
+
+.empty-board-card {
+  text-align: center;
+  border-radius: 20px;
+  padding: 40px 48px;
+  animation: float 3.5s ease-in-out infinite;
+
+  background: rgba(255,255,255,0.6);
+  border: 1.5px dashed rgba(0,0,0,0.1);
+  backdrop-filter: blur(6px);
+}
+
+html.dark .empty-board-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px dashed rgba(180, 190, 220, 0.15);
+}
+
+.empty-board-emoji {
+  font-size: 52px;
+  display: block;
+  margin-bottom: 14px;
+}
+
+html.dark .empty-board-emoji {
+  filter: drop-shadow(0 0 16px rgba(148, 163, 184, 0.4));
+}
+
+.empty-board-card h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #475569;
+}
+
+html.dark .empty-board-card h2 { color: #94a3b8; }
+
+.empty-board-card p {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+html.dark .empty-board-card p { color: rgba(148, 163, 184, 0.55); }
+
+.empty-board-card strong { color: #6366f1; }
+html.dark .empty-board-card strong { color: #cbd5e1; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* =====================================================
+   STICKY NOTE WRAPPER
+   ===================================================== */
+
+/* Light: simple clean shadow */
+.sticky-note-wrapper {
+  position: absolute;
+  will-change: transform, filter;
+  transition: filter 0.25s ease;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.12)) drop-shadow(0 1px 3px rgba(0,0,0,0.08));
+}
+
+.sticky-note-wrapper:hover {
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.16)) drop-shadow(0 2px 6px rgba(0,0,0,0.1));
+}
+
+.sticky-note-wrapper.is-dragging {
+  filter: drop-shadow(0 16px 36px rgba(0,0,0,0.22)) drop-shadow(0 4px 10px rgba(0,0,0,0.14));
+  z-index: 9999;
+}
+
+/* Dark: glow from darkness */
+html.dark .sticky-note-wrapper {
+  filter:
+    drop-shadow(0 0 1px rgba(255,255,255,0.12))
+    drop-shadow(0 6px 24px rgba(0,0,0,0.75))
+    drop-shadow(0 0 40px rgba(255,255,255,0.06));
+}
+
+html.dark .sticky-note-wrapper:hover {
+  filter:
+    drop-shadow(0 0 3px rgba(255,255,255,0.22))
+    drop-shadow(0 10px 32px rgba(0,0,0,0.7))
+    drop-shadow(0 0 60px rgba(255,255,255,0.11));
+}
+
+html.dark .sticky-note-wrapper.is-dragging {
+  filter:
+    drop-shadow(0 0 6px rgba(255,255,255,0.35))
+    drop-shadow(0 18px 44px rgba(0,0,0,0.8))
+    drop-shadow(0 0 80px rgba(255,255,255,0.15));
+}
+
+/* =====================================================
+   PUSH PIN
+   ===================================================== */
+
+.pin-container {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+/* Light pin: small warm-toned */
+.pin-head {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f87171, #b91c1c);
+  box-shadow: inset -1px -1px 3px rgba(0,0,0,0.35), 0 2px 5px rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.3);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+/* Dark pin: metallic silver glowing */
+html.dark .pin-head {
+  background: radial-gradient(circle at 35% 35%, #f1f5f9, #64748b);
+  box-shadow:
+    inset -1px -1px 3px rgba(0,0,0,0.5),
+    0 0 8px rgba(255,255,255,0.35),
+    0 2px 6px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.pin-shaft {
+  width: 2px;
+  height: 11px;
+  background: linear-gradient(to bottom, rgba(120,120,120,0.5), rgba(120,120,120,0.15));
+}
+
+html.dark .pin-shaft {
+  background: linear-gradient(to bottom, rgba(200,210,230,0.6), rgba(100,116,139,0.15));
+}
+
+/* =====================================================
+   NOTE BODY
+   ===================================================== */
+
+.note-body {
+  position: relative;
+  border-radius: 4px 4px 6px 6px;
+  padding: 16px 16px 14px;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -1px 0 rgba(0,0,0,0.05),
+    0 0 0 1px rgba(0,0,0,0.06);
+}
+
+.paper-lines {
+  display: none;
+}
+
+.folded-corner {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-left: 22px solid transparent;
+  border-top: 22px solid transparent;
+  border-left-width: 22px;
+  border-top-width: 22px;
+  opacity: 0.28;
+}
+
+/* =====================================================
+   NOTE HEADER
+   ===================================================== */
+
+.note-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.note-title {
+  flex: 1;
+  font-family: 'Caveat', cursive;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.2;
+  cursor: text;
+  word-break: break-word;
+  min-height: 26px;
+  transition: opacity 0.2s;
+}
+
+.note-title:hover { opacity: 0.7; }
+
+.title-input {
+  flex: 1;
+  font-family: 'Caveat', cursive;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  background: rgba(0,0,0,0.07);
+  border: 1.5px solid rgba(0,0,0,0.18);
+  border-radius: 6px;
+  padding: 2px 6px;
+  resize: none;
+  outline: none;
+  width: 100%;
+  line-height: 1.3;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.title-input:focus {
+  border-color: rgba(0,0,0,0.32);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+  background: rgba(0,0,0,0.1);
+}
+
+.header-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.42);
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+
+.icon-btn:hover { transform: scale(1.12); }
+.delete-note-btn:hover { background: rgba(220,38,38,0.18); color: #dc2626; }
+.minimize-btn:hover { background: rgba(37,99,235,0.14); color: #2563eb; }
+
+/* =====================================================
+   STATS BAR
+   ===================================================== */
+
+.stats-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.stat-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.2px;
+}
+
+.stat-badge.pending { background: rgba(0,0,0,0.09); color: rgba(0,0,0,0.5); }
+.stat-badge.done { background: rgba(22,163,74,0.16); color: #15803d; }
+
+/* =====================================================
+   DIVIDER
+   ===================================================== */
+
+.note-divider {
+  border: none;
+  border-top: 1.5px dashed;
+  opacity: 0.28;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+/* =====================================================
+   TODO LIST
+   ===================================================== */
+
+.todo-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow-y: auto;
+  max-height: 220px;
+  padding-right: 2px;
+  position: relative;
+  z-index: 2;
+}
+
+.todo-list-expanded { max-height: 55vh; }
+
+.todo-list::-webkit-scrollbar { width: 4px; }
+.todo-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; }
+.todo-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 10px; }
+
+.empty-state { text-align: center; padding: 12px 8px; opacity: 0.5; }
+.empty-icon { font-size: 26px; display: block; margin-bottom: 4px; }
+.empty-state p { margin: 0; font-family: 'Caveat', cursive; font-size: 15px; color: rgba(0,0,0,0.5); }
+.empty-hint { font-size: 12px !important; opacity: 0.7; }
+
+/* =====================================================
+   TODO ITEM
+   ===================================================== */
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.3);
+  transition: background 0.15s, opacity 0.3s, transform 0.3s;
+  animation: slide-in 0.22s ease;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.todo-item:hover { background: rgba(255,255,255,0.52); }
+.todo-item:hover .delete-todo-btn { opacity: 1; }
+
+.todo-done { background: rgba(255,255,255,0.14); }
+
+.todo-deleting { opacity: 0; transform: translateX(20px); }
+
+/* Custom circular checkbox */
+.todo-check-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.todo-checkbox { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.checkmark {
+  display: block;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.26);
+  background: rgba(255,255,255,0.5);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.todo-checkbox:checked + .checkmark { background: #22c55e; border-color: #16a34a; }
+
+.todo-checkbox:checked + .checkmark::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: 2px solid white;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+.todo-text {
+  flex: 1;
+  font-family: 'Caveat', cursive;
+  font-size: 17px;
+  color: #1a1a1a;
+  line-height: 1.3;
+  word-break: break-word;
+  transition: color 0.2s;
+}
+
+.todo-text-done { text-decoration: line-through; color: rgba(0,0,0,0.3); }
+
+.delete-todo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: rgba(0,0,0,0.28);
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.delete-todo-btn:hover { background: rgba(220,38,38,0.15); color: #dc2626; }
+
+/* =====================================================
+   ADD TASK
+   ===================================================== */
+
+.add-task-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+.add-task-input {
+  flex: 1;
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(0,0,0,0.16);
+  background: rgba(255,255,255,0.38);
+  color: #1a1a1a;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.add-task-input::placeholder { color: rgba(0,0,0,0.3); font-style: italic; }
+
+.add-task-input:focus {
+  border-color: rgba(0,0,0,0.3);
+  background: rgba(255,255,255,0.62);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+}
+
+.add-task-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(0,0,0,0.15);
+  color: rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.add-task-btn:hover { background: rgba(0,0,0,0.32); color: #fff; transform: scale(1.08); }
+.add-task-btn:active { transform: scale(0.95); }
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+.mobile-list {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: calc(100vh - 50px);
+}
+
+.mobile-note-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border-left: 5px solid;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  backdrop-filter: blur(6px);
+}
+
+html.dark .mobile-note-pill {
+  background: rgba(255,255,255,0.04);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+.mobile-note-pill:hover { transform: scale(1.01); box-shadow: 0 4px 18px rgba(0,0,0,0.14); }
+html.dark .mobile-note-pill:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.5); background: rgba(255,255,255,0.07); }
+.mobile-note-pill:active { transform: scale(0.98); }
+
+.mobile-pill-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.mobile-pill-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+
+.mobile-pill-title {
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+html.dark .mobile-pill-title { color: #e2e8f0; }
+
+.mobile-pill-count { font-size: 12px; color: #94a3b8; }
+
+.mobile-pill-icon { color: rgba(0,0,0,0.25); flex-shrink: 0; }
+html.dark .mobile-pill-icon { color: rgba(148,163,184,0.35); }
+
+.mobile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fade-in 0.2s ease;
+
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+}
+
+html.dark .mobile-modal-overlay { background: rgba(0,0,0,0.75); }
+
+.mobile-modal-stop { width: 100%; display: flex; justify-content: center; }
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* =====================================================
+   PARTICLES
+   ===================================================== */
+
+.particle-container {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 0; height: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.particle {
+  position: absolute;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  animation: particle-burst 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes particle-burst {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+/* =====================================================
+   BASE
+   ===================================================== */
+
+@layer base {
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+}

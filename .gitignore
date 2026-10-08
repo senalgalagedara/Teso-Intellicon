@@ -1,40 +1,52 @@
 # Dependencies
 node_modules/
-.venv/
-__pycache__/
-*.pyc
-
-# Next.js build
-.next/
-out/
-build/
+.pnpm-store/
 dist/
-
-# Local Environment Variables
-.env
-.env.local
-.env*.local
-.env.*
-!.env.example
-!.env.local.example
-*.db
-*.db-shm
-*.db-wal
-.pytest_cache/
-# Private, locally generated training datasets
-Agentic/exports/
-# User-supplied credentials stored outside environment files
-**/*APIkey*
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+build/
 .pnpm-debug.log*
 
-# IDE & OS
+# Next.js build output
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Turbo build cache
+.turbo/
+.vercel/
+
+# Logs and test output
+*.log
+coverage/
+.nyc_output/
+
+# Environments and Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+
+# Python Virtual Environments
+venv/
+.venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+
+# IDE and System Files
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-.neon
+Desktop.ini
