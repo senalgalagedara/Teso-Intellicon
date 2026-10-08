@@ -12,7 +12,7 @@ export default function NotFound() {
             Teso
           </Link>
           <nav className="site-nav" aria-label="Site">
-            <Link href="/exams">Exams</Link>
+            <Link href="/?tab=history">Attempt History</Link>
             <Link href="/sign-in">Sign in</Link>
           </nav>
         </div>
@@ -26,10 +26,7 @@ export default function NotFound() {
             That link doesn&apos;t point to anything on Teso. It may have moved or been removed.
           </p>
           <div className="home-actions">
-            <Link href="/exams/self-assessment" className="btn btn-primary">
-              Start self-assessment
-            </Link>
-            <Link href="/" className="btn btn-secondary">
+            <Link href="/" className="btn btn-primary">
               Back to home
             </Link>
           </div>

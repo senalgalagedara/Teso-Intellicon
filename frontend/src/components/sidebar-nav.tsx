@@ -33,13 +33,13 @@ export function SidebarNav({ links }: { links: { href: string; label: string }[]
 
         if (link.href.includes("?tab=")) {
           const targetTab = link.href.split("?tab=")[1];
-          active = pathname === "/dashboard" && currentTab === targetTab;
-        } else if (link.href === "/dashboard") {
-          active = pathname === "/dashboard" && (!currentTab || currentTab === "practice");
+          active = (pathname === "/" || pathname === "/dashboard") && currentTab === targetTab;
+        } else if (link.href === "/" || link.href === "/dashboard") {
+          active = (pathname === "/" || pathname === "/dashboard") && (!currentTab || currentTab === "practice");
         } else {
           active =
             link.href === pathname ||
-            (link.href !== "/dashboard" && pathname.startsWith(`${link.href}/`));
+            (link.href !== "/" && link.href !== "/dashboard" && pathname.startsWith(`${link.href}/`));
         }
 
         let displayLabel = link.label;

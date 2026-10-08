@@ -26,7 +26,7 @@ export async function assessmentIdentity(req: NextRequest) {
   const demo = demoIdentity(req);
   if (demo) return demo;
   const user = await getCurrentUser();
-  return user?.role === "student" ? { student_id: user.id, is_development: false } : null;
+  return user ? { student_id: user.id, is_development: user.role === "admin" } : null;
 }
 export function sameOrigin(req: NextRequest) {
   try {

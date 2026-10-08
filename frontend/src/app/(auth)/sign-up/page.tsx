@@ -1,14 +1,13 @@
 import Link from "next/link";
-
 import { SignUpForm } from "./sign-up-form";
 
 export default function SignUpPage() {
   return (
     <>
       <div className="auth-header">
-        <h1>Create an account</h1>
+        <h1>Student Registration</h1>
         <p className="auth-subtitle">
-          Students get access immediately. Teacher accounts need an admin approval.
+          Register with a username and password to start unlimited practice immediately.
         </p>
       </div>
 

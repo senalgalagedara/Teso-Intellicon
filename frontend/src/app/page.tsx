@@ -1,84 +1,134 @@
 import Link from "next/link";
+import { getCurrentUser, ROLE_LABELS } from "@/lib/auth/dal";
+import { SignOutButton } from "@/components/sign-out-button";
+import SelfAssessmentDashboard from "@/components/self-assessment-dashboard";
+import { getAdminOverviewStats } from "@/lib/db/admin";
 
-const STEPS = [
-  {
-    title: "Check answers and understand your mistakes",
-    body: "Every paper is scored immediately, with reviewed explanations for the questions you missed.",
-  },
-  {
-    title: "Revise the theory behind each question",
-    body: "Each concept links to the theory and approved study resources you need to close the gap.",
-  },
-  {
-    title: "Track topic progress across your saved papers",
-    body: "Your learning history shows which topics are improving and which still need practice.",
-  },
-];
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  const { tab } = (await searchParams) || {};
+  const activeTab = tab === "history" ? "history" : "practice";
+  const user = await getCurrentUser();
+
+  let adminStats: { subjectCount: number; questionCount: number } | null = null;
+  if (user?.role === "admin") {
+    try {
+      adminStats = await getAdminOverviewStats();
+    } catch {
+      // safe fallback
+    }
+  }
+
   return (
     <>
+      {/* SITE HEADER */}
       <header className="site-header">
         <div className="site-header-inner">
           <Link href="/" className="app-brand">
             <span className="brand-mark" aria-hidden="true">
               T
             </span>
-            Teso
+            Teso Intellicon
           </Link>
+
           <nav className="site-nav" aria-label="Site">
-            <Link href="/exams">Exams</Link>
-            <Link href="/sign-in">Sign in</Link>
-            <Link href="/dashboard" className="btn btn-secondary">
-              My account
+            {/* IN HEADER: INSTEAD OF EXAMS, SHOW ATTEMPT HISTORY */}
+            <Link
+              href="/?tab=history"
+              className={activeTab === "history" ? "active" : ""}
+              style={{ fontWeight: activeTab === "history" ? 700 : 500 }}
+            >
+              Attempt History
             </Link>
+
+            {user?.role === "admin" && (
+              <>
+                <Link href="/admin/subjects">Subjects</Link>
+                <Link href="/admin/questions">Question Pool</Link>
+                <Link href="/admin/questions/import">Import CSV</Link>
+              </>
+            )}
+
+            {user ? (
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginLeft: "8px" }}>
+                <span className={`badge ${roleBadgeClass(user.role)}`}>
+                  {ROLE_LABELS[user.role]}
+                </span>
+                <span style={{ fontSize: "0.875rem", fontWeight: 600 }}>{user.name}</span>
+                <SignOutButton />
+              </div>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "8px" }}>
+                <Link href="/sign-in" className="btn btn-secondary btn-sm">
+                  Sign in
+                </Link>
+                <Link href="/sign-up" className="btn btn-primary btn-sm">
+                  Register
+                </Link>
+              </div>
+            )}
           </nav>
         </div>
       </header>
 
-      <main className="container">
-        <section className="home-intro">
-          <p className="eyebrow">Self-study platform</p>
-          <h1>Learn what each paper tells you.</h1>
-          <p className="home-lede">
-            Choose your subject and language, take a self-assessment, and review explanations and
-            theory for the parts you missed. Your next paper revisits those topics and checks
-            earlier knowledge.
-          </p>
-          <div className="home-actions">
-            <Link href="/exams/self-assessment" className="btn btn-primary">
-              Start self-assessment
-            </Link>
-            <Link href="/sign-up" className="btn btn-secondary">
-              Create student account
-            </Link>
-          </div>
-        </section>
+      <main className="container" style={{ paddingTop: "24px" }}>
+        {/* ADMIN OVERVIEW SHORTCUT (IF ADMIN) */}
+        {user?.role === "admin" && adminStats && (
+          <section className="card" style={{ marginBottom: "28px", borderColor: "#c7d2fe", background: "#f8faff" }}>
+            <div className="row-between" style={{ flexWrap: "wrap", gap: "12px" }}>
+              <div>
+                <span className="eyebrow" style={{ color: "var(--primary)" }}>Admin Portal Overview</span>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: 700, margin: "2px 0 6px" }}>
+                  System Management
+                </h2>
+                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                  <span className="badge badge-neutral">Total Subjects: {adminStats.subjectCount}</span>
+                  <span className="badge badge-green">Questions in Pool: {adminStats.questionCount}</span>
+                </div>
+              </div>
 
-        <hr className="divider" />
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <Link href="/admin/subjects" className="btn btn-primary btn-sm">
+                  Manage Subjects
+                </Link>
+                <Link href="/admin/questions" className="btn btn-secondary btn-sm">
+                  Question Pool
+                </Link>
+                <Link href="/admin/questions/import" className="btn btn-secondary btn-sm">
+                  Import CSV
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
 
-        <section>
-          <h2 className="section-title" style={{ marginTop: 0 }}>
-            How it works
-          </h2>
-          <ol className="steps">
-            {STEPS.map((step, index) => (
-              <li key={step.title} className="step">
-                <span className="step-num" aria-hidden="true">
-                  {index + 1}
-                </span>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
+        {/* SELF ASSESSMENT & PRACTICE DASHBOARD ON HOME PAGE */}
+        <SelfAssessmentDashboard
+          showTopNav={false}
+          embedded={false}
+          initialTab={activeTab}
+          initialUserName={user?.name}
+          initialUserEmail={user?.email}
+        />
       </main>
-
-      <footer className="site-footer">
-        Teso Intellicon — course platform where students join by invitation and teacher accounts
-        are approved by an admin.
-      </footer>
     </>
   );
+}
+
+function roleBadgeClass(role: string): string {
+  switch (role) {
+    case "admin":
+      return "badge-red";
+    case "teacher":
+      return "badge-blue";
+    case "teacher_pending":
+      return "badge-yellow";
+    default:
+      return "badge-green";
+  }
 }

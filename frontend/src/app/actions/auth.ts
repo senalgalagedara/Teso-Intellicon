@@ -42,7 +42,7 @@ export async function finishSignUpAction(
   }
 
   if (user.role !== "student") {
-    redirect("/dashboard");
+    redirect("/");
   }
 
   if (requested === "teacher") {
@@ -60,5 +60,5 @@ export async function finishSignUpAction(
     redirect("/pending");
   }
 
-  redirect("/dashboard");
+  redirect("/");
 }
