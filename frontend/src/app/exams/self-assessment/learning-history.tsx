@@ -7,7 +7,7 @@ const change = (value: number | null) => value === null ? "First evidence" : `${
 
 export default function History({ history, busy, open }: {history: LearningHistory; busy: boolean; open: (id: string) => void}) {
   return <section className={styles.card} id="learning-history">
-    <p className={styles.eyebrow}>Your personalized learning history</p>
+    <p className={`${styles.eyebrow} ${styles.eyebrowAi}`}>Your personalized learning history</p>
     <h2>{history.completed_count} completed papers</h2>
     <p className={styles.muted}>{history.interpretation}</p>
     {history.completed_count === 0 && <p>Complete your first paper to see theory topics, missed questions, and improvement here.</p>}

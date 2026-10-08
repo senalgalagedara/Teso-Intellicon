@@ -68,3 +68,7 @@ def recommendation(sid: str, identity: Identity = Depends(authenticate)):
 @router.post('/sessions/{sid}/next', response_model=schemas.Started)
 def next_paper(sid: str, request: schemas.NextRequest, identity: Identity = Depends(authenticate)):
     return learning.start_next(db.engine, sid, identity, request.question_count)
+
+@router.post('/sessions/{sid}/check', response_model=schemas.CheckAnswerResponse)
+def check_answer(sid: str, request: schemas.CheckAnswerRequest, identity: Identity = Depends(authenticate)):
+    return service.check_single_answer(db.engine, sid, identity, request.question_id, request.selected_option, request.active_duration_ms)

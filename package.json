@@ -1,18 +1,23 @@
 {
-  "name": "nextjs-fastapi-supabase-template",
+  "name": "teso-intellicon",
   "version": "1.0.0",
   "private": true,
-  "description": "Full-stack template featuring Next.js App Router (frontend + backend API), Supabase DB & Storage, and Python FastAPI AI backend.",
+  "description": "Full-stack educational platform for Sri Lankan G.C.E. A/L students & teachers featuring Next.js 15, Neon Postgres with Neon Auth, and the TESO Revision Engine.",
   "scripts": {
     "dev": "concurrently -n \"NEXT,FASTAPI\" -c \"magenta,cyan\" \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "cd frontend && npm run dev",
-    "dev:agentic": "cd Agentic && .\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --port 8000",
+    "dev:agentic": "cd Agentic && .\\.venv\\Scripts\\python.exe -m app.server",
+
     "dev:backend": "npm run dev:agentic",
     "dev:worker": "cd Agentic && .\\.venv\\Scripts\\python.exe -m app.assessment.worker",
     "test:agentic": "cd Agentic && .\\.venv\\Scripts\\python.exe -m pytest -q",
     "test:backend": "npm run test:agentic",
     "build:frontend": "cd frontend && npm run build",
-    "install:all": "npm install && cd frontend && npm install && cd ../Agentic && .\\.venv\\Scripts\\python.exe -m pip install -r requirements.txt"
+    "install:all": "npm install && cd frontend && npm install && cd ../Agentic && .\\.venv\\Scripts\\python.exe -m pip install -r requirements.txt",
+    "seed": "python scripts/seed_questions.py && python scripts/seed_mock_cohort.py",
+    "seed:questions": "python scripts/seed_questions.py",
+    "seed:cohort": "python scripts/seed_mock_cohort.py"
+
   },
   "devDependencies": {
     "concurrently": "^9.2.4"

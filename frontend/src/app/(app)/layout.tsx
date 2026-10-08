@@ -1,8 +1,10 @@
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getCurrentUser, ROLE_LABELS } from "@/lib/auth/dal";
 import { SignOutButton } from "@/components/sign-out-button";
+import { SidebarNav } from "@/components/sidebar-nav";
 
 export const dynamic = "force-dynamic";
 
@@ -17,28 +19,63 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="app-shell">
-      <div className="ambient-glow-1" />
-      <div className="ambient-glow-2" />
-
-      <header className="app-header">
-        <Link href="/dashboard" className="app-brand">
-          <span className="gradient-text">Teso Intellicon</span>
+      <aside className="app-sidebar">
+        <Link href="/" className="app-brand">
+          <span className="brand-mark" aria-hidden="true">
+            T
+          </span>
+          Teso
         </Link>
 
-        <nav className="app-nav">
-          <RoleNav role={user.role} />
+        <nav className="app-nav" aria-label="Main">
+          <span className="app-nav-label">Menu</span>
+          <Suspense fallback={null}>
+            <SidebarNav links={roleLinks(user.role)} />
+          </Suspense>
         </nav>
 
-        <div className="app-user">
+        <div className="sidebar-foot">
           <span className={`badge ${roleBadgeClass(user.role)}`}>{ROLE_LABELS[user.role]}</span>
-          <span className="app-user-name">{user.name}</span>
+          <span className="sidebar-user" title={user.email}>
+            {user.name}
+          </span>
           <SignOutButton />
         </div>
-      </header>
+      </aside>
 
-      <main className="container">{children}</main>
+      <div className="app-main">
+        <main className="container">{children}</main>
+      </div>
     </div>
   );
+}
+
+function roleLinks(role: string): { href: string; label: string }[] {
+  if (role === "student") {
+    return [
+      { href: "/", label: "Practice & Subjects" },
+      { href: "/?tab=history", label: "Attempt History" },
+    ];
+  }
+
+  const links: { href: string; label: string }[] = [{ href: "/", label: "Home" }];
+
+  if (role === "teacher") {
+    links.push({ href: "/teacher", label: "Courses" });
+    links.push({ href: "/teacher/zscores", label: "Z-Scores" });
+  }
+
+  if (role === "teacher_pending") {
+    links.push({ href: "/pending", label: "Approval" });
+  }
+
+  if (role === "admin") {
+    links.push({ href: "/admin/subjects", label: "Subjects" });
+    links.push({ href: "/admin/questions", label: "Question Pool" });
+    links.push({ href: "/admin/questions/import", label: "Import CSV" });
+  }
+
+  return links;
 }
 
 function roleBadgeClass(role: string): string {
@@ -52,34 +89,4 @@ function roleBadgeClass(role: string): string {
     default:
       return "badge-green";
   }
-}
-
-function RoleNav({ role }: { role: string }) {
-  const links: { href: string; label: string }[] = [{ href: "/dashboard", label: "Overview" }];
-
-  if (role === "student") {
-    links.push({ href: "/student", label: "My learning" }, { href: "/student#courses", label: "My courses" }, { href: "/exams/self-assessment", label: "Self-assessment" });
-  }
-
-  if (role === "teacher") {
-    links.push({ href: "/teacher", label: "My courses" });
-  }
-
-  if (role === "teacher_pending") {
-    links.push({ href: "/pending", label: "Approval" });
-  }
-
-  if (role === "admin") {
-    links.push({ href: "/admin/teachers", label: "Teacher approvals" });
-  }
-
-  return (
-    <>
-      {links.map((link) => (
-        <Link key={link.href} href={link.href} className="app-nav-link">
-          {link.label}
-        </Link>
-      ))}
-    </>
-  );
 }

@@ -24,8 +24,8 @@ export function demoIdentity(req: NextRequest) {
 }
 export async function assessmentIdentity(req: NextRequest) {
   const user = await getCurrentUser();
-  // A previous local demo must never hide a signed-in student's saved work.
-  if (user) return user.role === "student" ? { student_id: user.id, is_development: false } : null;
+  // A previous local demo must never hide a signed-in user's saved work.
+  if (user) return { student_id: user.id, is_development: user.role === "admin" };
   return demoIdentity(req);
 }
 export function sameOrigin(req: NextRequest) {

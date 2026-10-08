@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 
 import { auth } from "@/lib/auth/server";
+import { problemResponse } from "@/lib/api/problems-response";
 import { resolveUserRole } from "@/lib/db/queries";
 import type { UserRole } from "@/lib/auth/roles";
 
@@ -72,7 +73,9 @@ export async function authorize(allowedRoles: readonly UserRole[]): Promise<Auth
 }
 
 export function deny(result: AuthFailure): Response {
-  return Response.json({ error: result.error }, { status: result.status });
+  return problemResponse(result.status, result.error, {
+    ...(result.status === 401 ? { type: "unauthenticated" } : { type: "forbidden" }),
+  });
 }
 
 /** Human-readable label for a role, used in the UI. */

@@ -1,6 +1,15 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 
+class ProblemResponse(BaseModel):
+    """RFC 9457 problem details: the single error shape clients should parse."""
+    type: str = 'about:blank'
+    title: str
+    status: int
+    detail: str
+    instance: Optional[str] = None
+    errors: Optional[List[Dict[str, Any]]] = None
+
 class HealthResponse(BaseModel):
     status: str
     version: str

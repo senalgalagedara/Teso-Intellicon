@@ -1,9 +1,13 @@
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import List
+from typing import List, Optional, Tuple
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file='.env', extra='ignore')
+    model_config = SettingsConfigDict(
+        env_file=('.env', '../.env'),
+        env_file_encoding='utf-8',
+        extra='ignore'
+    )
     PROJECT_NAME: str = "FastAPI AI Engine"
     VERSION: str = "1.0.0"
     PORT: int = 8000
@@ -13,7 +17,14 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
     
-    # Supabase
+    # Revision Engine & Database
+    DATABASE_URL: Optional[str] = "sqlite:///./teso-dev.db"
+    ENGINE_API_KEY: str = "dev-secret-change-me"
+    
+    # Selector weights: (w1_topic_need, w2_difficulty_fit, w3_due_bonus, w4_novelty)
+    SELECTOR_WEIGHTS: Tuple[float, float, float, float] = (0.4, 0.3, 0.2, 0.1)
+    
+    # Supabase (auxiliary storage)
     SUPABASE_URL: str = "https://your-project-id.supabase.co"
     SUPABASE_KEY: str = "your-supabase-key"
     SUPABASE_STORAGE_BUCKET: str = "app-storage"
@@ -25,7 +36,6 @@ class Settings(BaseSettings):
     DEFAULT_AI_MODEL: str = "gpt-4o-mini"
 
     # Assessment service: explicit provider, no automatic mock on live failures.
-    DATABASE_URL: str = "sqlite:///./teso-dev.db"
     DATABASE_URL_UNPOOLED: str = ""
     ML_EXPORT_SALT: str = ""
     ASSESSMENT_BRIDGE_SECRET: str = ""

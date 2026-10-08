@@ -2,6 +2,8 @@ import { fastapiBaseUrl } from "@/lib/fastapi-url";
 import { NextRequest, NextResponse } from "next/server";
 
 import { authorize, deny } from "@/lib/auth/dal";
+import { readProblem } from "@/lib/api/problems";
+import { problemResponse } from "@/lib/api/problems-response";
 
 const ALLOWED_ACTIONS = ["chat", "analyze", "embeddings"] as const;
 
@@ -43,24 +45,22 @@ export async function POST(req: NextRequest) {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errText = await response.text();
-      return NextResponse.json(
-        { error: `FastAPI responded with ${response.status}: ${errText}` },
-        { status: response.status }
-      );
+      const problem = await readProblem(response).catch(() => undefined);
+      console.error("[api/ai] upstream error", { action, status: response.status, detail: problem?.detail });
+      if (response.status >= 500) {
+        return problemResponse(503, "The AI service is temporarily unavailable. Please try again shortly.");
+      }
+      return problemResponse(problem?.status ?? response.status, problem?.detail ?? "The request was rejected.", {
+        title: problem?.title,
+        type: problem?.type,
+        errors: problem?.errors,
+      });
     }
 
     const data = await response.json();
     return NextResponse.json(data);
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Error contacting FastAPI";
-    return NextResponse.json(
-      {
-        error: "Failed to communicate with FastAPI Python AI backend.",
-        details: message,
-        hint: "Ensure FastAPI is running on http://127.0.0.1:8000 (run: uvicorn app.main:app --reload)",
-      },
-      { status: 503 }
-    );
+    console.error("[api/ai] proxy failed", err);
+    return problemResponse(503, "The AI service is temporarily unavailable. Please try again shortly.");
   }
 }
