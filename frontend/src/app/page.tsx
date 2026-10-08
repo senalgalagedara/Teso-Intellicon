@@ -43,7 +43,7 @@ export default async function HomePage({
               className={activeTab === "history" ? "active" : ""}
               style={{ fontWeight: activeTab === "history" ? 700 : 500 }}
             >
-              Attempt History
+              පුහුණු ඉතිහාසය
             </Link>
 
             {user?.role === "admin" && (
@@ -67,10 +67,10 @@ export default async function HomePage({
             ) : (
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "8px" }}>
                 <Link href="/sign-in" className="btn btn-secondary btn-sm">
-                  Sign in
+                  ඇතුළු වන්න
                 </Link>
                 <Link href="/sign-up" className="btn btn-primary btn-sm">
-                  Register
+                  ලියාපදිංචි වන්න
                 </Link>
               </div>
             )}

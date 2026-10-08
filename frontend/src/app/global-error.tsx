@@ -12,7 +12,7 @@ const styles = {
     background: "#F8FAFC",
     color: "#0F172A",
     fontFamily:
-      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+      "'Noto Sans Sinhala', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
     WebkitFontSmoothing: "antialiased",
   },
   main: {
@@ -68,17 +68,16 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html lang="en">
+    <html lang="si">
       <body style={styles.body}>
         <main style={styles.main}>
           <p style={styles.eyebrow}>Teso</p>
-          <h1 style={styles.heading}>Something went wrong</h1>
+          <h1 style={styles.heading}>දෝෂයක් සිදු විය</h1>
           <p style={styles.lede}>
-            This page hit an unexpected problem while loading. Try again — if it keeps
-            happening, sign out and back in.
+            පූරණය වීමේදී මෙම පිටුවේ බලාපොරොත්තු නොවූ ගැටලුවක් ඇති විය. නැවත උත්සාහ කරන්න — මෙය දිගටම සිදුවේ නම්, ගිණුමෙන් ඉවත් වී නැවත ඇතුළු වන්න.
           </p>
           <button type="button" style={styles.button} onClick={reset}>
-            Try again
+            නැවත උත්සාහ කරන්න
           </button>
         </main>
       </body>

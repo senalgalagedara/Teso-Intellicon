@@ -53,8 +53,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 function roleLinks(role: string): { href: string; label: string }[] {
   if (role === "student") {
     return [
-      { href: "/", label: "Practice & Subjects" },
-      { href: "/?tab=history", label: "Attempt History" },
+      { href: "/", label: "පුහුණුව සහ විෂයයන්" },
+      { href: "/?tab=history", label: "පුහුණු ඉතිහාසය" },
     ];
   }
 

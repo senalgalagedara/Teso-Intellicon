@@ -5,16 +5,16 @@ export default function SignUpPage() {
   return (
     <>
       <div className="auth-header">
-        <h1>Student Registration</h1>
+        <h1>ශිෂ්‍ය ලියාපදිංචිය</h1>
         <p className="auth-subtitle">
-          Register with a username and password to start unlimited practice immediately.
+          අසීමිත පුහුණුව වහාම ආරම්භ කිරීමට පරිශීලක නාමයක් සහ මුරපදයක් සමඟ ලියාපදිංචි වන්න.
         </p>
       </div>
 
       <SignUpForm />
 
       <p className="auth-footer">
-        Already registered? <Link href="/sign-in">Sign in</Link>
+        දැනටමත් ලියාපදිංචි වී තිබේද? <Link href="/sign-in">ඇතුළු වන්න</Link>
       </p>
     </>
   );
