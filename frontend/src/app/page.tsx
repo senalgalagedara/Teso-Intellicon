@@ -1,20 +1,5 @@
 import Link from "next/link";
 
-const STEPS = [
-  {
-    title: "Check answers and understand your mistakes",
-    body: "Every paper is scored immediately, with reviewed explanations for the questions you missed.",
-  },
-  {
-    title: "Revise the theory behind each question",
-    body: "Each concept links to the theory and approved study resources you need to close the gap.",
-  },
-  {
-    title: "Track topic progress across your saved papers",
-    body: "Your learning history shows which topics are improving and which still need practice.",
-  },
-];
-
 export default function HomePage() {
   return (
     <>
@@ -56,29 +41,7 @@ export default function HomePage() {
         </section>
 
         <hr className="divider" />
-
-        <section>
-          <h2 className="section-title" style={{ marginTop: 0 }}>
-            How it works
-          </h2>
-          <ol className="steps">
-            {STEPS.map((step, index) => (
-              <li key={step.title} className="step">
-                <span className="step-num" aria-hidden="true">
-                  {index + 1}
-                </span>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
       </main>
-
-      <footer className="site-footer">
-        Teso Intellicon — course platform where students join by invitation and teacher accounts
-        are approved by an admin.
-      </footer>
     </>
   );
 }
