@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/guards";
 import { listTeacherRequests } from "@/lib/db/queries";
 import { listCoursesForTeacher } from "@/lib/db/queries";
+import { getAdminOverviewStats } from "@/lib/db/admin";
 import { ROLE_LABELS } from "@/lib/auth/dal";
 import SelfAssessmentDashboard from "@/components/self-assessment-dashboard";
 
@@ -85,23 +86,35 @@ async function PendingSummary({ userId }: { userId: string }) {
 }
 
 async function AdminSummary() {
-  const requests = await listTeacherRequests();
-  const pending = requests.filter((row) => row.status === "pending");
+  let subjectCount = 0;
+  let questionCount = 0;
+
+  try {
+    const stats = await getAdminOverviewStats();
+    subjectCount = stats.subjectCount;
+    questionCount = stats.questionCount;
+  } catch (err) {
+    console.error("[AdminSummary] failed to load stats:", err);
+  }
 
   return (
     <>
       <div className="stat-row">
-        <Stat
-          label="Awaiting approval"
-          value={pending.length}
-          tone={pending.length > 0 ? "warning" : undefined}
-        />
-        <Stat label="Reviewed requests" value={requests.length - pending.length} />
+        <Stat label="Total Subjects" value={subjectCount} />
+        <Stat label="Questions in Pool" value={questionCount} tone="success" />
       </div>
 
-      <Link href="/admin/teachers" className="btn btn-primary">
-        Review teacher requests
-      </Link>
+      <div style={{ display: "flex", gap: "12px", marginTop: "20px", flexWrap: "wrap" }}>
+        <Link href="/admin/subjects" className="btn btn-primary">
+          Manage Subjects
+        </Link>
+        <Link href="/admin/questions" className="btn btn-secondary">
+          Question Pool
+        </Link>
+        <Link href="/admin/questions/import" className="btn btn-secondary">
+          Import Questions (CSV)
+        </Link>
+      </div>
     </>
   );
 }

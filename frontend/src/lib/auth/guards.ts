@@ -34,7 +34,7 @@ export async function requireRole(...allowed: UserRole[]): Promise<AuthedUser> {
 export function homeForRole(role: UserRole): string {
   switch (role) {
     case "admin":
-      return "/admin/teachers";
+      return "/admin/subjects";
     case "teacher":
       return "/teacher";
     case "teacher_pending":

@@ -70,7 +70,9 @@ function roleLinks(role: string): { href: string; label: string }[] {
   }
 
   if (role === "admin") {
-    links.push({ href: "/admin/teachers", label: "Teacher approvals" });
+    links.push({ href: "/admin/subjects", label: "Subjects" });
+    links.push({ href: "/admin/questions", label: "Question Pool" });
+    links.push({ href: "/admin/questions/import", label: "Import CSV" });
   }
 
   return links;
