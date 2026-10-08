@@ -20,7 +20,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="app-shell">
       <aside className="app-sidebar">
-        <Link href="/dashboard" className="app-brand">
+        <Link href="/" className="app-brand">
           <span className="brand-mark" aria-hidden="true">
             T
           </span>
@@ -53,12 +53,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 function roleLinks(role: string): { href: string; label: string }[] {
   if (role === "student") {
     return [
-      { href: "/dashboard", label: "Practice & Subjects" },
-      { href: "/dashboard?tab=history", label: "Attempt History" },
+      { href: "/", label: "Practice & Subjects" },
+      { href: "/?tab=history", label: "Attempt History" },
     ];
   }
 
-  const links: { href: string; label: string }[] = [{ href: "/dashboard", label: "Overview" }];
+  const links: { href: string; label: string }[] = [{ href: "/", label: "Home" }];
 
   if (role === "teacher") {
     links.push({ href: "/teacher", label: "Courses" });

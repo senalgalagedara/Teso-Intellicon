@@ -86,6 +86,7 @@ export async function createSubjectAction(
     revalidatePath("/admin/questions");
     revalidatePath("/admin/questions/import");
     revalidatePath("/dashboard");
+    revalidatePath("/");
 
     return { success: `Subject "${name.trim()}" created successfully.` };
   } catch (error) {
@@ -122,6 +123,7 @@ export async function deleteSubjectAction(
     revalidatePath("/admin/questions");
     revalidatePath("/admin/questions/import");
     revalidatePath("/dashboard");
+    revalidatePath("/");
 
     return { success: "Subject deleted successfully." };
   } catch (error) {
@@ -172,6 +174,7 @@ export async function createAdminQuestionAction(
     revalidatePath("/admin/questions");
     revalidatePath("/admin/subjects");
     revalidatePath("/dashboard");
+    revalidatePath("/");
 
     return { success: "Question added to pool successfully." };
   } catch (error) {
@@ -207,6 +210,7 @@ export async function deleteAdminQuestionAction(
     revalidatePath("/admin/questions");
     revalidatePath("/admin/subjects");
     revalidatePath("/dashboard");
+    revalidatePath("/");
 
     return { success: "Question deleted from pool." };
   } catch (error) {
@@ -233,6 +237,7 @@ export async function approveAndImportQuestionsAction(
     revalidatePath("/admin/questions");
     revalidatePath("/admin/subjects");
     revalidatePath("/dashboard");
+    revalidatePath("/");
 
     return {
       ok: true,

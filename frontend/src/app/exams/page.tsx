@@ -12,9 +12,10 @@ export default function Exams() {
             Teso Intellicon
           </Link>
           <nav className="site-nav" aria-label="Site">
+            <Link href="/?tab=history">Attempt History</Link>
             <Link href="/sign-in">Sign in</Link>
-            <Link href="/dashboard" className="btn btn-secondary">
-              My account
+            <Link href="/" className="btn btn-secondary">
+              Home
             </Link>
           </nav>
         </div>
