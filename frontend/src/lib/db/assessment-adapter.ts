@@ -1,7 +1,7 @@
 import "server-only";
 
 import { query, sql } from "@/lib/db/client";
-import { ensureAdminTables } from "@/lib/db/admin";
+import { ensureAdminTables, recordLeaderboardScore } from "@/lib/db/admin";
 import type {
   Paper,
   Exam,
@@ -252,12 +252,51 @@ export async function checkCustomAnswer(
 
 export async function submitCustomSession(sessionId: string): Promise<boolean> {
   await ensureCustomSessionTables();
-  const rows = await query<{ id: string }>`
+  const rows = await query<{
+    id: string;
+    subject_id: string;
+    student_id: string;
+    answers: any;
+  }>`
     UPDATE app.custom_sessions
     SET status = 'submitted', submitted_at = now()
     WHERE id = ${sessionId}
-    RETURNING id
+    RETURNING id, subject_id, student_id, answers
   `;
+
+  if (rows.length > 0) {
+    try {
+      const sess = rows[0];
+      let answers = sess.answers;
+      if (typeof answers === "string") {
+        try {
+          answers = JSON.parse(answers);
+        } catch {
+          answers = {};
+        }
+      }
+      answers = answers || {};
+      const keys = Object.keys(answers);
+      const answeredCount = keys.length;
+      let correctCount = 0;
+      for (const k of keys) {
+        if (answers[k]?.is_correct) correctCount++;
+      }
+      const scorePercentage = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+
+      await recordLeaderboardScore({
+        subjectId: sess.subject_id,
+        studentId: sess.student_id,
+        scorePercentage,
+        totalQuestions: answeredCount,
+        correctAnswers: correctCount,
+        sessionId: sess.id,
+      });
+    } catch (e) {
+      console.error("[submitCustomSession] Failed to record leaderboard score:", e);
+    }
+  }
+
   return rows.length > 0;
 }
 

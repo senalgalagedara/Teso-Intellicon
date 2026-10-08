@@ -30,12 +30,18 @@ export default async function AdminQuestionsPage({
             Manage repository questions and answer choices. Questions can be added manually or imported via CSV.
           </p>
         </div>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+          <Link href="/admin/students" className="btn btn-secondary">
+            Students List
+          </Link>
+          <Link href="/admin/leaderboard" className="btn btn-secondary">
+            Leaderboard
+          </Link>
           <Link href="/admin/subjects" className="btn btn-secondary">
-            Manage Subjects
+            Subjects
           </Link>
           <Link href="/admin/questions/import" className="btn btn-primary">
-            Import from CSV
+            Import CSV
           </Link>
         </div>
       </div>

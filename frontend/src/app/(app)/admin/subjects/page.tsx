@@ -22,12 +22,18 @@ export default async function AdminSubjectsPage() {
             Create and organize academic subjects. Questions and practice pools belong to these subjects.
           </p>
         </div>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+          <Link href="/admin/students" className="btn btn-secondary">
+            Students List
+          </Link>
+          <Link href="/admin/leaderboard" className="btn btn-secondary">
+            Leaderboard
+          </Link>
           <Link href="/admin/questions" className="btn btn-secondary">
             Question Pool
           </Link>
           <Link href="/admin/questions/import" className="btn btn-primary">
-            Import Questions (CSV)
+            Import CSV
           </Link>
         </div>
       </div>

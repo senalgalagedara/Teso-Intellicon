@@ -73,6 +73,8 @@ function roleLinks(role: string): { href: string; label: string }[] {
     links.push({ href: "/admin/subjects", label: "Subjects" });
     links.push({ href: "/admin/questions", label: "Question Pool" });
     links.push({ href: "/admin/questions/import", label: "Import CSV" });
+    links.push({ href: "/admin/students", label: "Students" });
+    links.push({ href: "/admin/leaderboard", label: "Leaderboard" });
   }
 
   return links;
