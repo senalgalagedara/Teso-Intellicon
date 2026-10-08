@@ -949,7 +949,7 @@ export default function SelfAssessmentDashboard({
                 const isSelected = selectedOption === o.id;
                 let itemClass = styles.optionItem;
 
-                if (isChecked) {
+                if (checkedResult) {
                   itemClass += ` ${styles.optionDisabled}`;
                   if (o.id === checkedResult.correct_option_id) {
                     itemClass += ` ${styles.optionCorrect}`;
@@ -983,14 +983,14 @@ export default function SelfAssessmentDashboard({
                       <Media ids={o.media_ids} sid={exam.session_id} />
                     </span>
 
-                    {isChecked && o.id === checkedResult.correct_option_id && (
+                    {checkedResult && o.id === checkedResult.correct_option_id && (
                       <span className={`${styles.optionBadge} ${styles.badgeSuccess}`}>
                         <Check size={13} />
                         Correct
                       </span>
                     )}
 
-                    {isChecked && isSelected && !checkedResult.is_correct && (
+                    {checkedResult && isSelected && !checkedResult.is_correct && (
                       <span className={`${styles.optionBadge} ${styles.badgeDanger}`}>
                         <XCircle size={13} />
                         Incorrect
@@ -1001,7 +1001,7 @@ export default function SelfAssessmentDashboard({
               })}
             </div>
 
-            {isChecked && (
+            {checkedResult && (
               <div
                 className={`${styles.feedbackBox} ${
                   checkedResult.is_correct ? styles.feedbackCorrect : styles.feedbackIncorrect
