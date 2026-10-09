@@ -15,7 +15,7 @@ export default async function HomePage({
   const activeTab = tab === "history" ? "history" : "practice";
   const user = await getCurrentUser();
 
-  let adminStats: { subjectCount: number; questionCount: number } | null = null;
+  let adminStats: Awaited<ReturnType<typeof getAdminOverviewStats>> | null = null;
   if (user?.role === "admin") {
     try {
       adminStats = await getAdminOverviewStats();
