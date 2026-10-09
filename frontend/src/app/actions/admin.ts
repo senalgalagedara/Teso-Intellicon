@@ -10,6 +10,7 @@ import {
   deleteAdminQuestion,
   batchApproveAndCreateAdminQuestions,
   BatchQuestionInput,
+  syncLeaderboardFromSessions,
 } from "@/lib/db/admin";
 import { reviewTeacherRequest } from "@/lib/db/queries";
 import type { ActionState } from "@/app/actions/auth";
@@ -247,5 +248,27 @@ export async function approveAndImportQuestionsAction(
   } catch (error) {
     console.error("[action:approveAndImportQuestions]", error);
     return { ok: false, error: "Failed to import questions. Please check connection." };
+  }
+}
+
+/** Admin action to synchronize scores from sessions into the leaderboard */
+export async function syncLeaderboardAction(): Promise<ActionState> {
+  try {
+    const auth = await authorize(["admin"]);
+    if (!auth.ok) {
+      return { error: auth.error };
+    }
+
+    const count = await syncLeaderboardFromSessions();
+
+    revalidatePath("/admin/leaderboard");
+    revalidatePath("/admin/students");
+    revalidatePath("/dashboard");
+
+    return {
+      success: `Leaderboard successfully synchronized with ${count} session records.`,
+    };
+  } catch (error) {
+    return actionError("syncLeaderboard", error);
   }
 }
