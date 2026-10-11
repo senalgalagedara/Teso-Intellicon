@@ -31,7 +31,7 @@ export async function getNextQuestionAction(courseId: string): Promise<NextQuest
   `;
 
   if (enrollments.length === 0) {
-    return { ok: false, error: "You are not enrolled in this course." };
+    return { ok: false, error: "ඔබ මෙම පාඨමාලාවට ලියාපදිංචි වී නොමැත." };
   }
 
   try {
@@ -41,7 +41,7 @@ export async function getNextQuestionAction(courseId: string): Promise<NextQuest
     // 2. Load question for student (without correct_option or explanation)
     const question = await getQuestionForStudent(nextQ.question_id);
     if (!question) {
-      return { ok: false, error: "Recommended question is currently unavailable." };
+      return { ok: false, error: "නිර්දේශිත ප්‍රශ්නය මෙම අවස්ථාවේ ලබාගත නොහැක." };
     }
 
     // 3. Record serve timestamp in app.question_serves for server-side latency calculation
@@ -54,7 +54,7 @@ export async function getNextQuestionAction(courseId: string): Promise<NextQuest
       reason: nextQ.reason,
     };
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to load next question.";
+    const message = err instanceof Error ? err.message : "මීළඟ ප්‍රශ්නය පූරණය කිරීමට නොහැකි විය.";
     return { ok: false, error: message };
   }
 }
@@ -89,13 +89,13 @@ export async function submitAnswerAction(params: {
   );
 
   if (!attempt) {
-    return { ok: false, error: "Attempt already submitted or invalid serve session." };
+    return { ok: false, error: "උත්සාහය දැනටමත් ඉදිරිපත් කර ඇත හෝ සැසිය වලංගු නොවේ." };
   }
 
   // 2. Retrieve official answer and explanation to reveal to the student
   const details = await getQuestionAnswerDetails(attempt.question_id);
   if (!details) {
-    return { ok: false, error: "Question answer metadata missing." };
+    return { ok: false, error: "ප්‍රශ්නයේ පිළිතුරු දත්ත අස්ථානගත වී ඇත." };
   }
 
   // 3. Inform the engine to update Rasch ability, BKT, FSRS, and diagnosis with graceful degradation

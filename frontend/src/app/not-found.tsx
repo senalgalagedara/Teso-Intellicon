@@ -12,8 +12,8 @@ export default function NotFound() {
             Teso
           </Link>
           <nav className="site-nav" aria-label="Site">
-            <Link href="/?tab=history">Attempt History</Link>
-            <Link href="/sign-in">Sign in</Link>
+            <Link href="/?tab=history">පුහුණු ඉතිහාසය</Link>
+            <Link href="/sign-in">ඇතුළු වන්න</Link>
           </nav>
         </div>
       </header>
@@ -21,13 +21,13 @@ export default function NotFound() {
       <main className="container">
         <section className="home-intro">
           <p className="eyebrow">404</p>
-          <h1>Page not found</h1>
+          <h1>පිටුව හමු නොවීය</h1>
           <p className="home-lede">
-            That link doesn&apos;t point to anything on Teso. It may have moved or been removed.
+            මෙම සබැඳිය කිසිදු පිටුවකට යොමු නොවේ. එය ඉවත් කර හෝ වෙනත් ස්ථානයකට මාරු කර තිබිය හැක.
           </p>
           <div className="home-actions">
             <Link href="/" className="btn btn-primary">
-              Back to home
+              මුල් පිටුවට
             </Link>
           </div>
         </section>

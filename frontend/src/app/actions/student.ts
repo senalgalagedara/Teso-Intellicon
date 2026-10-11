@@ -46,7 +46,7 @@ export async function respondToInviteAction(
     revalidatePath("/student");
 
     return {
-      success: response === "accepted" ? "You joined the course." : "Invitation declined.",
+      success: response === "accepted" ? "ඔබ පාඨමාලාවට සම්බන්ධ විය." : "ආරාධනය ප්‍රතික්ෂේප විය.",
     };
   } catch (error) {
     return actionError("respondToInvite", error);
