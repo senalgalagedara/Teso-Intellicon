@@ -19,14 +19,14 @@ export function SignOutButton() {
       const { error: signOutError } = await authClient.signOut();
 
       if (signOutError) {
-        setError(authErrorText(signOutError, { fallback: "Could not sign you out. Please try again." }));
+        setError(authErrorText(signOutError, { fallback: "ඉවත් වීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න." }));
         return;
       }
 
       router.replace("/sign-in");
       router.refresh();
     } catch (e) {
-      setError(authErrorText(e, { fallback: "Could not sign you out. Please try again." }));
+      setError(authErrorText(e, { fallback: "ඉවත් වීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න." }));
     } finally {
       setPending(false);
     }
@@ -40,7 +40,7 @@ export function SignOutButton() {
         onClick={handleSignOut}
         disabled={pending}
       >
-        {pending ? "Signing out..." : "Sign out"}
+        {pending ? "ඉවත් වෙමින්..." : "ඉවත් වන්න"}
       </button>
       {error ? (
         <p className="form-error" role="alert">

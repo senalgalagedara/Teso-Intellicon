@@ -1,6 +1,8 @@
 /* Teso design system — light academic theme */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap');
 
 :root {
+  --font-sinhala: 'Noto Sans Sinhala', sans-serif;
   --bg: #f8fafc;
   --surface: #ffffff;
   --surface-muted: #f1f5f9;
@@ -50,7 +52,7 @@ html,
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  font-family: var(--font-sinhala), "Noto Sans Sinhala", var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     sans-serif;
   min-height: 100vh;
   line-height: 1.55;
@@ -1058,3 +1060,17 @@ body {
     font-size: 1.375rem;
   }
 }
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+

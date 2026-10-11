@@ -25,19 +25,19 @@ export function SignUpForm() {
     const confirm = String(form.get("confirmPassword") ?? "");
 
     if (!rawUsername) {
-      setAccountError("Please enter a username.");
+      setAccountError("කරුණාකර පරිශීලක නාමයක් ඇතුළත් කරන්න.");
       setAccountPending(false);
       return;
     }
 
     if (rawUsername.length < 3) {
-      setAccountError("Username must be at least 3 characters.");
+      setAccountError("පරිශීලක නාමය අවම වශයෙන් අක්ෂර 3 ක් විය යුතුය.");
       setAccountPending(false);
       return;
     }
 
     if (password !== confirm) {
-      setAccountError("Those passwords do not match.");
+      setAccountError("මුරපද එකිනෙකට නොගැලපේ.");
       setAccountPending(false);
       return;
     }
@@ -58,8 +58,8 @@ export function SignUpForm() {
     if (error) {
       setAccountError(
         authErrorText(error, {
-          duplicate: "An account with this username already exists. Try signing in instead.",
-          fallback: "Could not create account with that username.",
+          duplicate: "මෙම පරිශීලක නාමය සහිත ගිණුමක් දැනටමත් පවතී. ඒ වෙනුවට ඇතුළු වීමට උත්සාහ කරන්න.",
+          fallback: "මෙම පරිශීලක නාමය සමඟ ගිණුමක් සෑදීමට නොහැකි විය.",
         })
       );
       setAccountPending(false);
@@ -75,26 +75,26 @@ export function SignUpForm() {
     <div>
       <div style={{ marginBottom: "16px" }}>
         <Link href="/" className="back-link">
-          &larr; Back to Home
+          &larr; මුල් පිටුවට
         </Link>
       </div>
 
       <form onSubmit={handleAccountSubmit} className="auth-form">
         <label className="field">
-          <span>Full name</span>
+          <span>සම්පූර්ණ නම</span>
           <input
             className="input"
             name="name"
             autoComplete="name"
             required
             maxLength={120}
-            placeholder="e.g. Kamal Perera"
+            placeholder="උදා: කමල් පෙරේරා"
             autoFocus
           />
         </label>
 
         <label className="field">
-          <span>Username</span>
+          <span>පරිශීලක නාමය</span>
           <input
             className="input"
             name="username"
@@ -102,12 +102,12 @@ export function SignUpForm() {
             required
             minLength={3}
             maxLength={30}
-            placeholder="e.g. kamal123"
+            placeholder="උදා: kamal123"
           />
         </label>
 
         <label className="field">
-          <span>Password</span>
+          <span>මුරපදය</span>
           <input
             className="input"
             type="password"
@@ -115,12 +115,12 @@ export function SignUpForm() {
             autoComplete="new-password"
             required
             minLength={8}
-            placeholder="Minimum 8 characters"
+            placeholder="අවම වශයෙන් අක්ෂර 8 ක්"
           />
         </label>
 
         <label className="field">
-          <span>Confirm password</span>
+          <span>මුරපදය තහවුරු කරන්න</span>
           <input
             className="input"
             type="password"
@@ -128,19 +128,19 @@ export function SignUpForm() {
             autoComplete="new-password"
             required
             minLength={8}
-            placeholder="Re-enter your password"
+            placeholder="මුරපදය නැවත ඇතුළත් කරන්න"
           />
         </label>
 
         {accountError ? <p className="form-error">{accountError}</p> : null}
 
         <button type="submit" className="btn btn-primary" disabled={accountPending}>
-          {accountPending ? "Creating account..." : "Register Student Account"}
+          {accountPending ? "ගිණුම සාදමින්..." : "ශිෂ්‍ය ගිණුමක් ලියාපදිංචි කරන්න"}
         </button>
 
         <div style={{ marginTop: "12px", textAlign: "center" }}>
           <Link href="/" className="btn btn-secondary btn-sm" style={{ width: "100%" }}>
-            Cancel & Return Home
+            අවලංගු කර මුල් පිටුවට
           </Link>
         </div>
       </form>

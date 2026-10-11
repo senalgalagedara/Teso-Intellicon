@@ -14,18 +14,18 @@ export function MasteryBar({
   let barColor = "var(--accent-blue)";
   let badgeColor = "rgba(59, 130, 246, 0.15)";
   let textColor = "var(--accent-blue)";
-  let statusText = "Progressing";
+  let statusText = "ප්‍රගතියක් දක්වයි";
 
   if (status === "mastered") {
     barColor = "var(--accent-emerald)";
     badgeColor = "rgba(16, 185, 129, 0.15)";
     textColor = "var(--accent-emerald)";
-    statusText = "Mastered (≥95%)";
+    statusText = "ප්‍රගුණ කර ඇත (≥95%)";
   } else if (status === "weak") {
     barColor = "var(--accent-rose)";
     badgeColor = "rgba(244, 63, 94, 0.15)";
     textColor = "var(--accent-rose)";
-    statusText = "Weak (<60%)";
+    statusText = "දුර්වලයි (<60%)";
   }
 
   return (

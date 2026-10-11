@@ -12,10 +12,10 @@ export default function Exams() {
             Teso Intellicon
           </Link>
           <nav className="site-nav" aria-label="Site">
-            <Link href="/?tab=history">Attempt History</Link>
-            <Link href="/sign-in">Sign in</Link>
+            <Link href="/?tab=history">පුහුණු ඉතිහාසය</Link>
+            <Link href="/sign-in">ඇතුළු වන්න</Link>
             <Link href="/" className="btn btn-secondary">
-              Home
+              මුල් පිටුව
             </Link>
           </nav>
         </div>
@@ -24,11 +24,11 @@ export default function Exams() {
       <main className="container" style={{ maxWidth: 860 }}>
         <div className="page-head">
           <div>
-            <p className="eyebrow">Exams</p>
-            <h1 style={{ marginTop: 8 }}>Available resources</h1>
+            <p className="eyebrow">විභාග</p>
+            <h1 style={{ marginTop: 8 }}>පවතින සම්පත්</h1>
             <p className="page-subtitle">
-              Complete a paper independently, then review your saved score, concept performance,
-              explanations and study resources.
+              ප්‍රශ්න පත්‍රයක් ස්වාධීනව සම්පූර්ණ කර, ඔබේ ලකුණු, සංකල්ප දක්ෂතාව,
+              පැහැදිලි කිරීම් සහ අධ්‍යයන සම්පත් සමාලෝචනය කරන්න.
             </p>
           </div>
         </div>
@@ -36,14 +36,14 @@ export default function Exams() {
         <section className="card">
           <div className="row-between">
             <div>
-              <h2 className="card-title">Self-assessment</h2>
+              <h2 className="card-title">ස්වයං ඇගයීම</h2>
               <p className="muted" style={{ marginTop: 6, maxWidth: "56ch" }}>
-                Select a published paper in your subject and language. Results are saved to your
-                account, and your next paper revisits the topics you missed.
+                ඔබේ විෂය සහ භාෂාවට අදාළ ප්‍රශ්න පත්‍රයක් තෝරන්න. ප්‍රතිඵල ඔබේ ගිණුමේ සුරකින අතර,
+                මීළඟ ප්‍රශ්න පත්‍රයේදී ඔබ අතපසු වූ මාතෘකා නැවත ඉදිරිපත් කෙරේ.
               </p>
             </div>
             <Link className="btn btn-primary" href="/exams/self-assessment">
-              Choose a paper
+              ප්‍රශ්න පත්‍රයක් තෝරන්න
             </Link>
           </div>
         </section>

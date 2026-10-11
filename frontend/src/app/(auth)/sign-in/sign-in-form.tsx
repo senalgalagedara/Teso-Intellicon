@@ -23,7 +23,7 @@ export function SignInForm() {
     const password = String(form.get("password") ?? "");
 
     if (!rawUsername.trim()) {
-      setError("Please enter your username.");
+      setError("කරුණාකර ඔබගේ පරිශීලක නාමය ඇතුළත් කරන්න.");
       setPending(false);
       return;
     }
@@ -41,7 +41,7 @@ export function SignInForm() {
     }
 
     if (signInError) {
-      setError(authErrorText(signInError, { fallback: "Invalid username or password." }));
+      setError(authErrorText(signInError, { fallback: "වලංගු නොවන පරිශීලක නාමයක් හෝ මුරපදයකි." }));
       setPending(false);
       return;
     }
@@ -55,26 +55,26 @@ export function SignInForm() {
     <div>
       <div style={{ marginBottom: "16px" }}>
         <Link href="/" className="back-link">
-          &larr; Back to Home
+          &larr; මුල් පිටුවට
         </Link>
       </div>
 
       <form onSubmit={handleSubmit} className="auth-form">
         <label className="field">
-          <span>Username</span>
+          <span>පරිශීලක නාමය</span>
           <input
             className="input"
             type="text"
             name="username"
             autoComplete="username"
             required
-            placeholder="Enter your username"
+            placeholder="ඔබගේ පරිශීලක නාමය ඇතුළත් කරන්න"
             autoFocus
           />
         </label>
 
         <label className="field">
-          <span>Password</span>
+          <span>මුරපදය</span>
           <input
             className="input"
             type="password"
@@ -88,12 +88,12 @@ export function SignInForm() {
         {error ? <p className="form-error">{error}</p> : null}
 
         <button type="submit" className="btn btn-primary" disabled={pending}>
-          {pending ? "Signing in..." : "Sign in"}
+          {pending ? "ඇතුළු වෙමින්..." : "ඇතුළු වන්න"}
         </button>
 
         <div style={{ marginTop: "12px", textAlign: "center" }}>
           <Link href="/" className="btn btn-secondary btn-sm" style={{ width: "100%" }}>
-            Cancel & Return Home
+            අවලංගු කර මුල් පිටුවට
           </Link>
         </div>
       </form>

@@ -62,7 +62,7 @@ export function QuestionCard({
         });
       }
     } catch (err: unknown) {
-      setErrorMessage(err instanceof Error ? err.message : "Failed to submit attempt.");
+      setErrorMessage(err instanceof Error ? err.message : "පිළිතුර ඉදිරිපත් කිරීමට නොහැකි විය.");
     } finally {
       setIsSubmitting(false);
     }
@@ -83,7 +83,7 @@ export function QuestionCard({
         setResult(null);
       }
     } catch (err: unknown) {
-      setErrorMessage(err instanceof Error ? err.message : "Failed to load next question.");
+      setErrorMessage(err instanceof Error ? err.message : "මීළඟ ප්‍රශ්නය පූරණය කිරීමට නොහැකි විය.");
     } finally {
       setIsLoadingNext(false);
     }
@@ -92,13 +92,13 @@ export function QuestionCard({
   const getDiagnosisBadge = (label: string) => {
     switch (label) {
       case "solid":
-        return { text: "Solid understanding", bg: "rgba(16, 185, 129, 0.15)", color: "#10b981" };
+        return { text: "විශිෂ්ට අවබෝධයක්", bg: "rgba(16, 185, 129, 0.15)", color: "#10b981" };
       case "lucky_guess":
-        return { text: "Lucky guess (unusually fast)", bg: "rgba(245, 158, 11, 0.15)", color: "#f59e0b" };
+        return { text: "අනුමානයක් (අසාමාන්‍ය ලෙස වේගවත්)", bg: "rgba(245, 158, 11, 0.15)", color: "#f59e0b" };
       case "careless_error":
-        return { text: "Careless error (fast slip / peer trap)", bg: "rgba(249, 115, 22, 0.15)", color: "#f97316" };
+        return { text: "නොසැලකිලිමත් දෝෂයක්", bg: "rgba(249, 115, 22, 0.15)", color: "#f97316" };
       case "conceptual_gap":
-        return { text: "Conceptual gap (requires review)", bg: "rgba(244, 63, 94, 0.15)", color: "#f43f5e" };
+        return { text: "සංකල්පීය ඌනතාවක් (නැවත සමාලෝචනය අවශ්‍යයි)", bg: "rgba(244, 63, 94, 0.15)", color: "#f43f5e" };
       default:
         return { text: label, bg: "rgba(255, 255, 255, 0.1)", color: "#94a3b8" };
     }
@@ -121,10 +121,10 @@ export function QuestionCard({
             border: "1px solid rgba(99, 102, 241, 0.3)",
           }}
         >
-          Adaptive Target: {reason}
+          අනුවර්තී ඉලක්කය: {reason}
         </span>
         <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
-          Difficulty Level: {question.teacher_difficulty} / 3
+          අපහසුතා මට්ටම: {question.teacher_difficulty} / 3
         </span>
       </div>
 
@@ -201,7 +201,7 @@ export function QuestionCard({
             disabled={!selectedOption || isSubmitting}
             style={{ width: "100%", padding: "0.9rem", fontWeight: 600, fontSize: "1rem" }}
           >
-            {isSubmitting ? "Evaluating attempt..." : "Submit Answer"}
+            {isSubmitting ? "තක්සේරු කරමින්..." : "පිළිතුර ඉදිරිපත් කරන්න"}
           </button>
         ) : (
           <div style={{ marginTop: "1rem" }}>
@@ -217,7 +217,7 @@ export function QuestionCard({
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
                 <h4 style={{ fontWeight: 700, color: result.is_correct ? "var(--accent-emerald)" : "var(--accent-rose)" }}>
-                  {result.is_correct ? "✓ Correct Response!" : "✗ Incorrect"}
+                  {result.is_correct ? "✓ නිවැරදි පිළිතුරක්!" : "✗ වැරදියි"}
                 </h4>
                 {result.diagnosis && (
                   <span
@@ -230,18 +230,18 @@ export function QuestionCard({
                       color: getDiagnosisBadge(result.diagnosis.label).color,
                     }}
                   >
-                    Diagnosis: {getDiagnosisBadge(result.diagnosis.label).text}
+                    රෝග විනිශ්චය: {getDiagnosisBadge(result.diagnosis.label).text}
                   </span>
                 )}
               </div>
 
               {result.explanation ? (
                 <div style={{ marginTop: "0.75rem", fontSize: "0.95rem", color: "var(--text-main)", lineHeight: 1.6 }}>
-                  <strong>Explanation: </strong> {result.explanation}
+                  <strong>පැහැදිලි කිරීම: </strong> {result.explanation}
                 </div>
               ) : (
                 <p style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>
-                  No teacher explanation provided for this question.
+                  මෙම ප්‍රශ්නය සඳහා ගුරු පැහැදිලි කිරීමක් සපයා නොමැත.
                 </p>
               )}
             </div>
@@ -253,7 +253,7 @@ export function QuestionCard({
               disabled={isLoadingNext}
               style={{ width: "100%", padding: "0.9rem", fontWeight: 600, fontSize: "1rem" }}
             >
-              {isLoadingNext ? "Selecting next adaptive question..." : "Next Question →"}
+              {isLoadingNext ? "මීළඟ අනුවර්තී ප්‍රශ්නය තෝරමින්..." : "මීළඟ ප්‍රශ්නය →"}
             </button>
           </div>
         )}

@@ -15,7 +15,7 @@ export default async function HomePage({
   const activeTab = tab === "history" ? "history" : "practice";
   const user = await getCurrentUser();
 
-  let adminStats: { subjectCount: number; questionCount: number } | null = null;
+  let adminStats: Awaited<ReturnType<typeof getAdminOverviewStats>> | null = null;
   if (user?.role === "admin") {
     try {
       adminStats = await getAdminOverviewStats();
@@ -43,7 +43,7 @@ export default async function HomePage({
               className={activeTab === "history" ? "active" : ""}
               style={{ fontWeight: activeTab === "history" ? 700 : 500 }}
             >
-              Attempt History
+              පුහුණු ඉතිහාසය
             </Link>
 
             {user?.role === "admin" && (
@@ -51,6 +51,8 @@ export default async function HomePage({
                 <Link href="/admin/subjects">Subjects</Link>
                 <Link href="/admin/questions">Question Pool</Link>
                 <Link href="/admin/questions/import">Import CSV</Link>
+                <Link href="/admin/students">Students</Link>
+                <Link href="/admin/leaderboard">Leaderboard</Link>
               </>
             )}
 
@@ -65,10 +67,10 @@ export default async function HomePage({
             ) : (
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "8px" }}>
                 <Link href="/sign-in" className="btn btn-secondary btn-sm">
-                  Sign in
+                  ඇතුළු වන්න
                 </Link>
                 <Link href="/sign-up" className="btn btn-primary btn-sm">
-                  Register
+                  ලියාපදිංචි වන්න
                 </Link>
               </div>
             )}
@@ -84,23 +86,28 @@ export default async function HomePage({
               <div>
                 <span className="eyebrow" style={{ color: "var(--primary)" }}>Admin Portal Overview</span>
                 <h2 style={{ fontSize: "1.25rem", fontWeight: 700, margin: "2px 0 6px" }}>
-                  System Management
+                  System Management & Performance
                 </h2>
-                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                  <span className="badge badge-neutral">Total Subjects: {adminStats.subjectCount}</span>
-                  <span className="badge badge-green">Questions in Pool: {adminStats.questionCount}</span>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap", marginTop: "4px" }}>
+                  <span className="badge badge-neutral">Subjects: {adminStats.subjectCount}</span>
+                  <span className="badge badge-blue">Questions: {adminStats.questionCount}</span>
+                  <span className="badge badge-green">Registered Students: {adminStats.studentCount}</span>
+                  <span className="badge badge-yellow">Leaderboard Records: {adminStats.leaderboardCount}</span>
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 <Link href="/admin/subjects" className="btn btn-primary btn-sm">
-                  Manage Subjects
+                  Subjects
                 </Link>
                 <Link href="/admin/questions" className="btn btn-secondary btn-sm">
                   Question Pool
                 </Link>
-                <Link href="/admin/questions/import" className="btn btn-secondary btn-sm">
-                  Import CSV
+                <Link href="/admin/students" className="btn btn-secondary btn-sm">
+                  Students List
+                </Link>
+                <Link href="/admin/leaderboard" className="btn btn-secondary btn-sm">
+                  Leaderboard
                 </Link>
               </div>
             </div>

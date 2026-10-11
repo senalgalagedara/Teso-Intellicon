@@ -53,8 +53,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 function roleLinks(role: string): { href: string; label: string }[] {
   if (role === "student") {
     return [
-      { href: "/", label: "Practice & Subjects" },
-      { href: "/?tab=history", label: "Attempt History" },
+      { href: "/", label: "පුහුණුව සහ විෂයයන්" },
+      { href: "/?tab=history", label: "පුහුණු ඉතිහාසය" },
     ];
   }
 
@@ -73,6 +73,8 @@ function roleLinks(role: string): { href: string; label: string }[] {
     links.push({ href: "/admin/subjects", label: "Subjects" });
     links.push({ href: "/admin/questions", label: "Question Pool" });
     links.push({ href: "/admin/questions/import", label: "Import CSV" });
+    links.push({ href: "/admin/students", label: "Students" });
+    links.push({ href: "/admin/leaderboard", label: "Leaderboard" });
   }
 
   return links;

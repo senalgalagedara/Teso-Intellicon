@@ -80,7 +80,7 @@ export function deny(result: AuthFailure): Response {
 
 /** Human-readable label for a role, used in the UI. */
 export const ROLE_LABELS: Record<UserRole, string> = {
-  student: "Student",
+  student: "ශිෂ්‍ය",
   teacher_pending: "Teacher (pending)",
   teacher: "Teacher",
   admin: "Admin",

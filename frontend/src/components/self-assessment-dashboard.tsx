@@ -97,7 +97,7 @@ export default function SelfAssessmentDashboard({
   }, [initialTab]);
 
   // User Profile & Header State
-  const [userName, setUserName] = useState<string>(initialUserName || "Student");
+  const [userName, setUserName] = useState<string>(initialUserName || "ශිෂ්‍යයා");
   const [userEmail, setUserEmail] = useState<string>(initialUserEmail || "student@teso.lk");
   const [profileMenuOpen, setProfileMenuOpen] = useState<boolean>(false);
   const [loggingOut, setLoggingOut] = useState<boolean>(false);
@@ -161,7 +161,7 @@ export default function SelfAssessmentDashboard({
       try {
         const { data: sessionData } = await authClient.getSession();
         if (sessionData?.user) {
-          setUserName(sessionData.user.name || "Student");
+          setUserName(sessionData.user.name || "ශිෂ්‍යයා");
           setUserEmail(sessionData.user.email || "student@teso.lk");
         }
       } catch {
@@ -247,7 +247,7 @@ export default function SelfAssessmentDashboard({
           return;
         }
         setLoadFailed(true);
-        setError(messageForError(e, "Couldn't reach assessment service. Verify your backend server."));
+        setError(messageForError(e, "ඇගයීම් සේවාව සම්බන්ධ කර ගැනීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න."));
       } finally {
         if (active) setLoading(false);
       }
@@ -268,7 +268,7 @@ export default function SelfAssessmentDashboard({
         setShowAuth(true);
         return;
       }
-      setError(messageForError(e, "An error occurred. Please try again."));
+      setError(messageForError(e, "දෝෂයක් සිදු විය. කරුණාකර නැවත උත්සාහ කරන්න."));
     } finally {
       setBusy(false);
     }
@@ -281,7 +281,7 @@ export default function SelfAssessmentDashboard({
       papers[0];
 
     if (!matchingPaper) {
-      setError("No questions found for this subject.");
+      setError("මෙම විෂය සඳහා ප්‍රශ්න හමු නොවීය.");
       return;
     }
 
@@ -334,7 +334,7 @@ export default function SelfAssessmentDashboard({
         setCurrentStreak(0);
       }
     } catch (e) {
-      setError(messageForError(e, "Couldn't verify your answer. Please try again."));
+      setError(messageForError(e, "ඔබගේ පිළිතුර තහවුරු කිරීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න."));
     } finally {
       setIsChecking(false);
     }
@@ -414,19 +414,19 @@ export default function SelfAssessmentDashboard({
 
             <Link href="/" className={styles.navHomeBtn}>
               <Home size={15} />
-              <span>Home</span>
+              <span>මුල් පිටුව</span>
             </Link>
 
             <Link href="/dashboard" className={styles.navLink}>
               <LayoutDashboard size={15} />
-              <span>Dashboard</span>
+              <span>උපකරණ පුවරුව</span>
             </Link>
           </div>
 
           <div className={styles.navRight}>
             <div className={styles.headerHighScorePill}>
               <Trophy size={15} color="#d97706" />
-              <span>High: {highScore} pts</span>
+              <span>ඉහළම: {highScore} ලකුණු</span>
             </div>
 
             <div className={styles.profileMenuContainer} ref={profileMenuRef}>
@@ -459,7 +459,7 @@ export default function SelfAssessmentDashboard({
                     onClick={() => setProfileMenuOpen(false)}
                   >
                     <User size={15} />
-                    <span>Dashboard</span>
+                    <span>උපකරණ පුවරුව</span>
                   </Link>
                   <div className={styles.dropdownDivider} />
                   <button
@@ -469,7 +469,7 @@ export default function SelfAssessmentDashboard({
                     onClick={handleLogout}
                   >
                     <LogOut size={15} />
-                    <span>{loggingOut ? "Signing out..." : "Sign Out"}</span>
+                    <span>{loggingOut ? "ඉවත් වෙමින්..." : "ගිණුමෙන් ඉවත් වන්න"}</span>
                   </button>
                 </div>
               )}
@@ -480,10 +480,10 @@ export default function SelfAssessmentDashboard({
               className={styles.logoutBtn}
               onClick={handleLogout}
               disabled={loggingOut}
-              title="Log out of account"
+              title="ගිණුමෙන් ඉවත් වන්න"
             >
               <LogOut size={15} />
-              <span>{loggingOut ? "..." : "Log Out"}</span>
+              <span>{loggingOut ? "..." : "ඉවත් වන්න"}</span>
             </button>
           </div>
         </header>
@@ -492,10 +492,7 @@ export default function SelfAssessmentDashboard({
       {/* 2. SUB-HEADER / DASHBOARD TITLE */}
       <div className={styles.dashHeader}>
         <div>
-          <h1 className={styles.dashTitle}>Self-Assessment &amp; Practice</h1>
-          <p className={styles.dashSubtitle}>
-            Practice questions one by one with immediate feedback and test your limits in unlimited mode.
-          </p>
+          <h1 className={styles.dashTitle}>ස්වයං ඇගයීම සහ පුහුණුව</h1>
         </div>
       </div>
 
@@ -537,9 +534,9 @@ export default function SelfAssessmentDashboard({
           <div className={styles.summaryIconWrap} style={{ background: "#eef2ff", color: "#4f46e5" }}>
             <Award size={36} />
           </div>
-          <h2 className={styles.summaryTitle}>Student Account Required</h2>
+          <h2 className={styles.summaryTitle}>ශිෂ්‍ය ගිණුමක් අවශ්‍යයි</h2>
           <p className={styles.summaryDesc}>
-            Sign in to track your scores, save your high score records, and build your mastery history.
+            ඔබේ ලකුණු නිරීක්ෂණය කිරීමට, වාර්තා සුරැකීමට සහ විෂය ප්‍රවීණතා ඉතිහාසය ගොඩනැගීමට ගිණුමට ඇතුළු වන්න.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link
@@ -547,14 +544,14 @@ export default function SelfAssessmentDashboard({
               className={styles.checkBtn}
               style={{ textDecoration: "none" }}
             >
-              Sign In
+              ඇතුළු වන්න
             </Link>
             <Link
               href="/sign-up"
               className={styles.actionBtn}
               style={{ textDecoration: "none", padding: "10px 20px" }}
             >
-              Create Account
+              ගිණුමක් සාදන්න
             </Link>
           </div>
           {demoAvailable && (
@@ -570,7 +567,7 @@ export default function SelfAssessmentDashboard({
                   })
                 }
               >
-                Launch Local Development Demo
+                නිරූපණ මාදිලිය අරඹන්න
               </button>
             </div>
           )}
@@ -579,7 +576,7 @@ export default function SelfAssessmentDashboard({
 
       {loading && !showAuth && (
         <p style={{ textAlign: "center", color: "#64748b", margin: "40px 0" }}>
-          Loading your assessment dashboard...
+          ඇගයීම් පුවරුව පූරණය වෙමින් පවතී...
         </p>
       )}
 
@@ -595,7 +592,7 @@ export default function SelfAssessmentDashboard({
                 onClick={() => setActiveTab("practice")}
               >
                 <BookOpen size={16} />
-                Practice &amp; Subjects
+                පුහුණුව සහ විෂයයන්
               </button>
               <button
                 type="button"
@@ -603,7 +600,7 @@ export default function SelfAssessmentDashboard({
                 onClick={() => setActiveTab("history")}
               >
                 <HistoryIcon size={16} />
-                Attempt History ({sessions.length})
+                පුහුණු ඉතිහාසය ({sessions.length})
               </button>
             </div>
           )}
@@ -612,8 +609,8 @@ export default function SelfAssessmentDashboard({
           <div className={styles.statsGrid}>
             <div className={styles.statCard}>
               <div className={styles.statInfo}>
-                <span className={styles.statLabel}>All-Time High Score</span>
-                <span className={styles.statValue}>{highScore} pts</span>
+                <span className={styles.statLabel}>සමස්ත ඉහළම ලකුණු</span>
+                <span className={styles.statValue}>{highScore} ලකුණු</span>
               </div>
               <div className={styles.statIconWrap} style={{ color: "#d97706", background: "#fffbeb" }}>
                 <Trophy size={22} />
@@ -622,7 +619,7 @@ export default function SelfAssessmentDashboard({
 
             <div className={styles.statCard}>
               <div className={styles.statInfo}>
-                <span className={styles.statLabel}>Completed Sessions</span>
+                <span className={styles.statLabel}>සම්පූර්ණ කළ වාර</span>
                 <span className={styles.statValue}>{sessions.length}</span>
               </div>
               <div className={styles.statIconWrap} style={{ color: "#4f46e5", background: "#eef2ff" }}>
@@ -632,7 +629,7 @@ export default function SelfAssessmentDashboard({
 
             <div className={styles.statCard}>
               <div className={styles.statInfo}>
-                <span className={styles.statLabel}>Questions Solved</span>
+                <span className={styles.statLabel}>විසඳූ ප්‍රශ්න ගණන</span>
                 <span className={styles.statValue}>{totalAnsweredGlobal}</span>
               </div>
               <div className={styles.statIconWrap} style={{ color: "#059669", background: "#ecfdf5" }}>
@@ -642,7 +639,7 @@ export default function SelfAssessmentDashboard({
 
             <div className={styles.statCard}>
               <div className={styles.statInfo}>
-                <span className={styles.statLabel}>Overall Accuracy</span>
+                <span className={styles.statLabel}>සමස්ත නිවැරදිතාව</span>
                 <span className={styles.statValue}>
                   {globalAccuracy > 0 ? `${globalAccuracy}%` : "—"}
                 </span>
@@ -658,39 +655,16 @@ export default function SelfAssessmentDashboard({
             <section>
               <div className={styles.sectionHeader}>
                 <div>
-                  <h3 className={styles.sectionTitle}>Available Subjects</h3>
+                  <h3 className={styles.sectionTitle}>පවතින විෂයයන්</h3>
                   <p style={{ margin: "4px 0 0", fontSize: "0.875rem", color: "#64748b" }}>
-                    Select a subject to begin unlimited question practice. Questions keep coming until you choose to stop and save your high score!
+                    අසීමිත ප්‍රශ්න පුහුණුව ආරම්භ කිරීමට විෂයයක් තෝරන්න. ඔබ නවතා සුරකින තෙක් ප්‍රශ්න අඛණ්ඩව ලැබෙනු ඇත!
                   </p>
-                </div>
-
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "0.85rem", color: "#64748b", fontWeight: 500 }}>
-                    Language:
-                  </span>
-                  <select
-                    value={selectedLanguage}
-                    onChange={(e) => setSelectedLanguage(e.target.value)}
-                    style={{
-                      padding: "6px 12px",
-                      borderRadius: "8px",
-                      border: "1px solid #cbd5e1",
-                      fontFamily: "inherit",
-                      fontSize: "0.85rem",
-                    }}
-                  >
-                    {Object.entries(languages).map(([id, name]) => (
-                      <option key={id} value={id}>
-                        {name}
-                      </option>
-                    ))}
-                  </select>
                 </div>
               </div>
 
               {subjectList.length === 0 ? (
                 <div className={styles.questionCard} style={{ textAlign: "center", padding: "40px" }}>
-                  <p style={{ color: "#64748b" }}>No published questions available at this time.</p>
+                  <p style={{ color: "#64748b" }}>මෙම අවස්ථාවේ ප්‍රකාශිත ප්‍රශ්න නොමැත.</p>
                 </div>
               ) : (
                 <div className={styles.subjectGrid}>
@@ -700,30 +674,30 @@ export default function SelfAssessmentDashboard({
                         <div className={styles.tileTop}>
                           <div className={styles.tileIcon}>📚</div>
                           {sub.isDevelopment ? (
-                            <span className={styles.tileBadge}>Development Sample</span>
+                            <span className={styles.tileBadge}>නියැදි අභ්‍යාස</span>
                           ) : (
                             <span
                               className={styles.tileBadge}
                               style={{ background: "#ecfdf5", color: "#059669", borderColor: "#a7f3d0" }}
                             >
-                              Live Bank
+                              සක්‍රීය ප්‍රශ්න බැංකුව
                             </span>
                           )}
                         </div>
 
                         <h3 className={styles.tileTitle}>{sub.name}</h3>
                         <p className={styles.tileDesc}>
-                          Adaptive multiple-choice practice. Answer questions one by one with immediate step-by-step solutions and study theory.
+                          අනුවර්තී බහුවරණ ප්‍රශ්න පුහුණුව. පියවරෙන් පියවර විසඳුම් සහ සිද්ධාන්ත සමඟ ප්‍රශ්න එකින් එක විසඳන්න.
                         </p>
 
                         <div className={styles.tileMeta}>
                           <div className={styles.tileMetaItem}>
                             <Sparkles size={16} color="#6366f1" />
-                            <span>Unlimited Practice Mode</span>
+                            <span>අසීමිත පුහුණු මාදිලිය</span>
                           </div>
                           <div className={styles.tileMetaItem}>
                             <Trophy size={16} color="#d97706" />
-                            <span>Personal High Score</span>
+                            <span>පෞද්ගලික ඉහළම ලකුණු</span>
                           </div>
                         </div>
                       </div>
@@ -734,7 +708,7 @@ export default function SelfAssessmentDashboard({
                         disabled={busy}
                         onClick={() => void startSubjectPractice(sub.id)}
                       >
-                        Start Unlimited Practice
+                        අසීමිත පුහුණුව අරඹන්න
                         <ArrowRight size={16} />
                       </button>
                     </div>
@@ -750,9 +724,9 @@ export default function SelfAssessmentDashboard({
               <div className={styles.historyCard}>
                 <div className={styles.historyHeader}>
                   <div>
-                    <h3 className={styles.sectionTitle}>Your Attempt History</h3>
+                    <h3 className={styles.sectionTitle}>ඔබගේ පුහුණු ඉතිහාසය</h3>
                     <p style={{ margin: "4px 0 0", fontSize: "0.85rem", color: "#64748b" }}>
-                      Review your past practice sessions, accuracy rates, and detailed question explanations.
+                      ඔබගේ පසුගිය පුහුණු වාර, නිවැරදිතා ප්‍රතිශත සහ සවිස්තරාත්මක ප්‍රශ්න පැහැදිලි කිරීම් සමාලෝචනය කරන්න.
                     </p>
                   </div>
                   <span
@@ -765,24 +739,24 @@ export default function SelfAssessmentDashboard({
                       color: "#475569",
                     }}
                   >
-                    {sessions.length} recorded attempts
+                    වාර්තාගත උත්සාහයන් {sessions.length}
                   </span>
                 </div>
 
                 {sessions.length === 0 ? (
                   <p style={{ color: "#64748b", padding: "20px 0", textAlign: "center" }}>
-                    No completed sessions yet. Start your first practice session above!
+                    තවමත් සම්පූර්ණ කළ පුහුණු වාර නොමැත. ඉහතින් ඔබගේ පළමු පුහුණු වාරය ආරම්භ කරන්න!
                   </p>
                 ) : (
                   <div className={styles.tableWrap}>
                     <table className={styles.table}>
                       <thead>
                         <tr>
-                          <th>Date</th>
-                          <th>Subject / Paper</th>
-                          <th>Status</th>
-                          <th>Score / Performance</th>
-                          <th style={{ textAlign: "right" }}>Action</th>
+                          <th>දිනය</th>
+                          <th>විෂය / ප්‍රශ්න පත්‍රය</th>
+                          <th>තත්ත්වය</th>
+                          <th>ලකුණු / දක්ෂතාව</th>
+                          <th style={{ textAlign: "right" }}>ක්‍රියාව</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -806,25 +780,24 @@ export default function SelfAssessmentDashboard({
                                     color: s.status === "submitted" ? "#059669" : "#d97706",
                                   }}
                                 >
-                                  {s.status === "submitted" ? "Completed" : "In Progress"}
+                                  {s.status === "submitted" ? "සම්පූර්ණයි" : "සිදු වෙමින් පවතී"}
                                 </span>
                               </td>
                               <td>
                                 {percentage !== undefined ? (
                                   <span
-                                    className={`${styles.badge} ${
-                                      percentage >= 70
-                                        ? styles.badgeHigh
-                                        : percentage >= 50
+                                    className={`${styles.badge} ${percentage >= 70
+                                      ? styles.badgeHigh
+                                      : percentage >= 50
                                         ? styles.badgeMid
                                         : styles.badgeLow
-                                    }`}
+                                      }`}
                                   >
                                     {matchingAttempt?.score.awarded_marks} /{" "}
                                     {matchingAttempt?.score.total_marks} ({percentage}%)
                                   </span>
                                 ) : (
-                                  <span style={{ color: "#94a3b8" }}>Draft recorded</span>
+                                  <span style={{ color: "#94a3b8" }}>කෙටුම්පතක් වාර්තා විය</span>
                                 )}
                               </td>
                               <td style={{ textAlign: "right" }}>
@@ -834,7 +807,7 @@ export default function SelfAssessmentDashboard({
                                   disabled={busy}
                                   onClick={() => void runAction(() => openSession(s.id))}
                                 >
-                                  {s.status === "submitted" ? "Review Paper →" : "Continue"}
+                                  {s.status === "submitted" ? "ප්‍රශ්න පත්‍රය සමාලෝචනය →" : "ඉදිරියට යන්න"}
                                 </button>
                               </td>
                             </tr>
@@ -850,7 +823,7 @@ export default function SelfAssessmentDashboard({
               {history && history.concepts.length > 0 && (
                 <div className={styles.historyCard}>
                   <h3 className={styles.sectionTitle} style={{ marginBottom: "16px" }}>
-                    Topic Mastery &amp; Concept Progress
+                    මාතෘකා ප්‍රවීණතාව සහ සංකල්ප ප්‍රගතිය
                   </h3>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
                     {history.concepts.map((c) => (
@@ -900,23 +873,23 @@ export default function SelfAssessmentDashboard({
             <div className={styles.practiceStats}>
               <div className={`${styles.pill} ${styles.pillScore}`}>
                 <Zap size={15} />
-                <span>Score: {currentScore} pts</span>
+                <span>ලකුණු: {currentScore}</span>
               </div>
 
               <div className={`${styles.pill} ${styles.pillHigh}`}>
                 <Trophy size={15} />
-                <span>High Score: {highScore} pts</span>
+                <span>ඉහළම ලකුණු: {highScore}</span>
               </div>
 
               {currentStreak > 1 && (
                 <div className={`${styles.pill} ${styles.pillStreak}`}>
                   <Flame size={15} />
-                  <span>{currentStreak} Streak!</span>
+                  <span>{currentStreak} අඛණ්ඩ නිවැරදි!</span>
                 </div>
               )}
 
               <span style={{ fontSize: "0.85rem", color: "#64748b", fontWeight: 500 }}>
-                Question #{poolIndex + 1}
+                ප්‍රශ්නය #{poolIndex + 1}
               </span>
             </div>
 
@@ -927,17 +900,17 @@ export default function SelfAssessmentDashboard({
               onClick={handleStopAndSave}
             >
               <StopCircle size={15} />
-              Stop &amp; Save High Score
+              නවතා ලකුණු සුරකින්න
             </button>
           </div>
 
           <div className={styles.questionCard}>
             <div className={styles.questionBadgeRow}>
               <span className={styles.qIndexBadge}>
-                Question {poolIndex + 1} &middot; {currentQ.marks || 1} mark
+                ප්‍රශ්නය {poolIndex + 1} &middot; ලකුණු {currentQ.marks || 1}
               </span>
               <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
-                Mode: Unlimited Practice
+                මාදිලිය: අසීමිත පුහුණුව
               </span>
             </div>
 
@@ -971,9 +944,8 @@ export default function SelfAssessmentDashboard({
                     }}
                   >
                     <div
-                      className={`${styles.radioCircle} ${
-                        isSelected ? styles.radioCircleActive : ""
-                      }`}
+                      className={`${styles.radioCircle} ${isSelected ? styles.radioCircleActive : ""
+                        }`}
                     >
                       {isSelected && <div className={styles.radioCircleDot} />}
                     </div>
@@ -986,14 +958,14 @@ export default function SelfAssessmentDashboard({
                     {checkedResult && o.id === checkedResult.correct_option_id && (
                       <span className={`${styles.optionBadge} ${styles.badgeSuccess}`}>
                         <Check size={13} />
-                        Correct
+                        නිවැරදියි
                       </span>
                     )}
 
                     {checkedResult && isSelected && !checkedResult.is_correct && (
                       <span className={`${styles.optionBadge} ${styles.badgeDanger}`}>
                         <XCircle size={13} />
-                        Incorrect
+                        වැරදියි
                       </span>
                     )}
                   </div>
@@ -1003,27 +975,24 @@ export default function SelfAssessmentDashboard({
 
             {checkedResult && (
               <div
-                className={`${styles.feedbackBox} ${
-                  checkedResult.is_correct ? styles.feedbackCorrect : styles.feedbackIncorrect
-                }`}
+                className={`${styles.feedbackBox} ${checkedResult.is_correct ? styles.feedbackCorrect : styles.feedbackIncorrect
+                  }`}
               >
                 <div
-                  className={`${styles.feedbackHeader} ${
-                    checkedResult.is_correct
-                      ? styles.feedbackHeaderCorrect
-                      : styles.feedbackHeaderIncorrect
-                  }`}
+                  className={`${styles.feedbackHeader} ${checkedResult.is_correct
+                    ? styles.feedbackHeaderCorrect
+                    : styles.feedbackHeaderIncorrect
+                    }`}
                 >
                   {checkedResult.is_correct ? (
                     <>
                       <CheckCircle2 size={18} />
-                      Correct! +{checkedResult.marks || 1} Points
+                      නිවැරදියි! +{checkedResult.marks || 1} ලකුණු
                     </>
                   ) : (
                     <>
                       <XCircle size={18} />
-                      Incorrect &mdash; Correct answer is Option{" "}
-                      {checkedResult.correct_option_id.toUpperCase()}
+                      වැරදියි &mdash; නිවැරදි පිළිතුර {checkedResult.correct_option_id.toUpperCase()} වේ
                     </>
                   )}
                 </div>
@@ -1035,7 +1004,7 @@ export default function SelfAssessmentDashboard({
                 {checkedResult.resources && checkedResult.resources.length > 0 && (
                   <div className={styles.theoryAccordion}>
                     <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "#475569" }}>
-                      📖 Study Notes &amp; Theory
+                      📖 අධ්‍යයන සටහන් සහ සිද්ධාන්ත
                     </span>
                     {checkedResult.resources.map((r) => (
                       <details key={r.id} className={styles.theoryDetails}>
@@ -1048,7 +1017,7 @@ export default function SelfAssessmentDashboard({
                             rel="noopener noreferrer"
                             style={{ color: "#4f46e5", textDecoration: "underline" }}
                           >
-                            Read Reference Document ↗
+                            මූලාශ්‍ර ලේඛනය බලන්න ↗
                           </a>
                         )}
                       </details>
@@ -1066,11 +1035,11 @@ export default function SelfAssessmentDashboard({
                   disabled={!selectedOption || isChecking || busy}
                   onClick={handleCheckAnswer}
                 >
-                  {isChecking ? "Checking..." : "Check Answer"}
+                  {isChecking ? "පරීක්ෂා කරමින්..." : "පිළිතුර පරීක්ෂා කරන්න"}
                 </button>
               ) : (
                 <button type="button" className={styles.nextBtn} onClick={handleNextQuestion}>
-                  Next Question
+                  මීළඟ ප්‍රශ්නය
                   <ArrowRight size={16} />
                 </button>
               )}
@@ -1089,28 +1058,28 @@ export default function SelfAssessmentDashboard({
           {isNewHighScore && (
             <div className={styles.newHighScoreBadge}>
               <Sparkles size={14} />
-              NEW ALL-TIME HIGH SCORE!
+              නව සමස්ත ඉහළම ලකුණු වාර්තාවක්!
             </div>
           )}
 
           <h2 className={styles.summaryTitle}>
-            {isNewHighScore ? "Incredible Job! 🎉" : "Practice Run Complete!"}
+            {isNewHighScore ? "විශිෂ්ටයි! 🎉" : "පුහුණු වාරය අවසන්!"}
           </h2>
           <p className={styles.summaryDesc}>
-            You answered {questionsAnswered} questions during this practice session.
+            මෙම පුහුණු වාරයේදී ඔබ ප්‍රශ්න {questionsAnswered} කට පිළිතුරු ලබා දුන්නා.
           </p>
 
           <div className={styles.scoreBanner}>
             <div className={styles.scoreItem}>
-              <span className={styles.scoreItemLabel}>Final Score</span>
+              <span className={styles.scoreItemLabel}>අවසාන ලකුණු</span>
               <span className={styles.scoreItemVal} style={{ color: "#4f46e5" }}>
-                {currentScore} pts
+                {currentScore} ලකුණු
               </span>
             </div>
             <div className={styles.scoreItem}>
-              <span className={styles.scoreItemLabel}>All-Time High Score</span>
+              <span className={styles.scoreItemLabel}>සමස්ත ඉහළම ලකුණු</span>
               <span className={styles.scoreItemVal} style={{ color: "#d97706" }}>
-                {highScore} pts
+                {highScore} ලකුණු
               </span>
             </div>
           </div>
@@ -1127,7 +1096,7 @@ export default function SelfAssessmentDashboard({
                 void loadData();
               }}
             >
-              Return to Dashboard
+              නැවත උපකරණ පුවරුවට
             </button>
           </div>
         </div>
@@ -1138,7 +1107,7 @@ export default function SelfAssessmentDashboard({
         <div style={{ animation: "fadeIn 0.25s ease-out" }}>
           <div className={styles.questionCard}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <span className={styles.qIndexBadge}>Attempt Result Review</span>
+              <span className={styles.qIndexBadge}>ප්‍රතිඵල සමාලෝචනය</span>
               <button
                 type="button"
                 className={styles.actionBtn}
@@ -1149,27 +1118,27 @@ export default function SelfAssessmentDashboard({
                   void loadData();
                 }}
               >
-                ← Back to Dashboard
+                ← නැවත උපකරණ පුවරුවට
               </button>
             </div>
 
             <div className={styles.scoreBanner} style={{ margin: "20px 0" }}>
               <div className={styles.scoreItem}>
-                <span className={styles.scoreItemLabel}>Score</span>
+                <span className={styles.scoreItemLabel}>ලකුණු</span>
                 <span className={styles.scoreItemVal}>
                   {result.score.awarded_marks} / {result.score.total_marks}
                 </span>
               </div>
               <div className={styles.scoreItem}>
-                <span className={styles.scoreItemLabel}>Accuracy</span>
+                <span className={styles.scoreItemLabel}>නිවැරදිතාව</span>
                 <span className={styles.scoreItemVal} style={{ color: "#059669" }}>
                   {result.score.percentage}%
                 </span>
               </div>
               <div className={styles.scoreItem}>
-                <span className={styles.scoreItemLabel}>Performance</span>
+                <span className={styles.scoreItemLabel}>දක්ෂතාව</span>
                 <span style={{ fontSize: "1rem", fontWeight: 600, color: "#64748b" }}>
-                  {result.score.correct} Correct &middot; {result.score.incorrect} Incorrect
+                  නිවැරදි {result.score.correct} &middot; වැරදි {result.score.incorrect}
                 </span>
               </div>
             </div>
@@ -1179,7 +1148,7 @@ export default function SelfAssessmentDashboard({
 
           <div className={styles.historyCard}>
             <h3 className={styles.sectionTitle} style={{ marginBottom: "20px" }}>
-              Detailed Question Solutions
+              සවිස්තරාත්මක ප්‍රශ්න විසඳුම්
             </h3>
             {result.questions.map((r, i) => (
               <div
@@ -1191,7 +1160,7 @@ export default function SelfAssessmentDashboard({
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                   <span style={{ fontWeight: 600, fontSize: "0.95rem" }}>
-                    Question {i + 1}
+                    ප්‍රශ්නය {i + 1}
                   </span>
                   <span
                     className={styles.badge}
@@ -1200,7 +1169,7 @@ export default function SelfAssessmentDashboard({
                       color: r.answer.correct ? "#059669" : "#dc2626",
                     }}
                   >
-                    {r.answer.correct ? "✓ Correct" : "✗ Incorrect"}
+                    {r.answer.correct ? "✓ නිවැරදියි" : "✗ වැරදියි"}
                   </span>
                 </div>
                 <p style={{ margin: "8px 0", fontSize: "1rem", color: "#0f172a" }}>
@@ -1209,7 +1178,7 @@ export default function SelfAssessmentDashboard({
                 <Media ids={r.question.media_ids} sid={result.session_id} />
 
                 <p style={{ margin: "8px 0", fontSize: "0.85rem", color: "#64748b" }}>
-                  Your Choice: <strong>{r.answer.selected_option?.toUpperCase() || "None"}</strong> &middot; Correct Answer:{" "}
+                  ඔබේ තේරීම: <strong>{r.answer.selected_option?.toUpperCase() || "කිසිවක් නැත"}</strong> &middot; නිවැරදි පිළිතුර:{" "}
                   <strong style={{ color: "#059669" }}>{r.question.correct_option_id.toUpperCase()}</strong>
                 </p>
 
@@ -1223,7 +1192,7 @@ export default function SelfAssessmentDashboard({
                   }}
                 >
                   <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>
-                    Explanation
+                    පැහැදිලි කිරීම
                   </span>
                   <p style={{ margin: "4px 0 0", fontSize: "0.875rem", color: "#1e293b", lineHeight: 1.5 }}>
                     {r.analysis?.feedback.explanation || r.base_explanation}
